@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,11 +8,14 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
     <div class="admin-container">
         <div class="admin-header">
             <h2>Admin Dashboard</h2>
-            <a href="index.html" class="btn-outline" style="text-decoration: none; display: inline-block; padding: 8px 16px; border-radius: 4px;">Back to Player</a>
+            <a href="index.html" class="btn-outline"
+                style="text-decoration: none; display: inline-block; padding: 8px 16px; border-radius: 4px;">Back to
+                Player</a>
         </div>
 
         <div class="admin-grid">
@@ -20,32 +24,32 @@
                 <h3 id="formTitle" style="margin-bottom: 20px;">Add New Song</h3>
                 <form id="songForm">
                     <input type="hidden" id="songId">
-                    
+
                     <div class="form-group">
                         <label for="title">Song Title *</label>
                         <input type="text" id="title" required>
                     </div>
-                    
+
                     <div class="form-group">
                         <label for="artist">Artist *</label>
                         <input type="text" id="artist" required>
                     </div>
-                    
+
                     <div class="form-group">
                         <label for="album">Album</label>
                         <input type="text" id="album">
                     </div>
-                    
+
                     <div class="form-group">
                         <label for="cover_url">Cover Image URL</label>
                         <input type="url" id="cover_url" placeholder="https://...">
                     </div>
-                    
+
                     <div class="form-group">
                         <label for="audio_url">Cloudinary Audio URL *</label>
                         <input type="url" id="audio_url" required placeholder="https://res.cloudinary.com/...">
                     </div>
-                    
+
                     <div style="display: flex; gap: 10px;">
                         <button type="submit" class="btn-primary" id="submitBtn">Add Song</button>
                         <button type="button" class="btn-outline hidden" id="cancelBtn">Cancel</button>
@@ -77,4 +81,5 @@
     <script src="supabase-client.js"></script>
     <script src="admin.js"></script>
 </body>
+
 </html>
