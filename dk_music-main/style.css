@@ -2483,7 +2483,8 @@ body {
 /* Hidden on desktop */
 .mobile-bottom-nav,
 .mobile-mini-player,
-.mobile-player-sheet {
+.mobile-player-sheet,
+.drawer-handle-bar {
   display: none;
 }
 
@@ -2500,21 +2501,33 @@ body {
   }
 
   /* 2. Layout Reset for Full Screen Mobile View */
+  body {
+    overscroll-behavior-y: none;
+    -webkit-tap-highlight-color: transparent;
+  }
   .app-layout {
     padding: 0 !important;
     gap: 0 !important;
     height: 100dvh;
+    overflow: hidden;
   }
   .main-content {
     border-radius: 0 !important;
     border: none !important;
-    padding-bottom: 155px !important; /* Space for mini-player + bottom nav */
+    padding-bottom: calc(150px + env(safe-area-inset-bottom, 0px)) !important;
+    -webkit-overflow-scrolling: touch;
+    user-select: none;
   }
 
   /* 3. Streamlined Topbar */
   .topbar {
     padding: 10px 14px !important;
     gap: 8px !important;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
   }
   .topbar-nav {
     display: none !important;
@@ -2534,23 +2547,31 @@ body {
 
   /* 4. Compact Content Sections */
   .content-section {
-    padding: 14px 14px 20px 14px !important;
+    padding: 12px 14px 20px 14px !important;
   }
   .greeting-row {
-    margin-bottom: 14px !important;
+    margin-bottom: 12px !important;
   }
   .greeting-text {
-    font-size: 1.4rem !important;
+    font-size: 1.35rem !important;
   }
   .greeting-sub {
-    font-size: 0.78rem !important;
+    font-size: 0.76rem !important;
   }
   .home-badge-row {
     margin-top: 6px;
+    gap: 6px;
+    overflow-x: auto;
+    padding-bottom: 4px;
+    scrollbar-width: none;
+  }
+  .home-badge-row::-webkit-scrollbar {
+    display: none;
   }
   .chip-badge {
     font-size: 0.72rem;
     padding: 4px 10px;
+    white-space: nowrap;
   }
 
   /* Grids to Compact Mobile */
@@ -2559,46 +2580,64 @@ body {
     gap: 8px !important;
   }
   .quick-card {
-    height: 52px !important;
+    height: 54px !important;
+    touch-action: manipulation;
+  }
+  .quick-card:active {
+    transform: scale(0.96);
+    transition: transform 0.1s ease;
   }
   .quick-card-title {
-    font-size: 0.78rem !important;
+    font-size: 0.76rem !important;
   }
   .quick-play {
-    display: none !important; /* Touch friendly: tap card directly */
+    display: none !important;
   }
 
   .song-grid, .library-grid {
-    grid-template-columns: repeat(auto-fill, minmax(135px, 1fr)) !important;
-    gap: 12px !important;
+    grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)) !important;
+    gap: 10px !important;
   }
   .scroll-row {
-    gap: 12px !important;
+    gap: 10px !important;
+    padding-bottom: 6px;
   }
   .album-card, .playlist-card {
-    width: 135px !important;
-    min-width: 135px !important;
+    width: 130px !important;
+    min-width: 130px !important;
     padding: 8px !important;
+    touch-action: manipulation;
+  }
+  .album-card:active, .playlist-card:active {
+    transform: scale(0.96);
+    transition: transform 0.1s ease;
   }
   .card-title, .playlist-card-title {
-    font-size: 0.82rem !important;
+    font-size: 0.8rem !important;
   }
 
   /* Compact Track Rows */
   .track-row {
-    padding: 8px 10px !important;
+    padding: 9px 10px !important;
     gap: 10px !important;
+    touch-action: manipulation;
+    border-radius: var(--radius-md);
+  }
+  .track-row:active {
+    background: rgba(255, 255, 255, 0.08) !important;
+    transform: scale(0.985);
   }
   .track-num-wrap {
-    width: 20px !important;
+    width: 18px !important;
   }
   .track-thumb {
-    width: 40px !important;
-    height: 40px !important;
+    width: 42px !important;
+    height: 42px !important;
+    border-radius: 6px;
   }
   .track-name {
     font-size: 0.84rem !important;
-    max-width: 160px;
+    max-width: 165px;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -2623,15 +2662,17 @@ body {
     bottom: 0;
     left: 0;
     right: 0;
-    height: 58px;
-    background: rgba(14, 14, 22, 0.95);
+    height: calc(56px + env(safe-area-inset-bottom, 0px));
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+    background: rgba(10, 10, 16, 0.94);
     backdrop-filter: blur(25px);
     -webkit-backdrop-filter: blur(25px);
     border-top: 1px solid rgba(255, 255, 255, 0.08);
     z-index: 1500;
     justify-content: space-around;
     align-items: center;
-    padding: 0 4px;
+    user-select: none;
+    touch-action: manipulation;
   }
   .mobile-nav-item {
     background: transparent;
@@ -2648,6 +2689,10 @@ body {
     transition: all 0.2s ease;
     font-family: inherit;
     position: relative;
+    touch-action: manipulation;
+  }
+  .mobile-nav-item:active {
+    transform: scale(0.92);
   }
   .mobile-nav-item i {
     font-size: 1.15rem;
@@ -2661,22 +2706,28 @@ body {
     transform: translateY(-2px);
   }
 
-  /* 6. DOCKED MOBILE MINI-PLAYER */
+  /* 6. DOCKED MOBILE MINI-PLAYER (Floats above bottom nav with swipe support) */
   .mobile-mini-player {
     display: block !important;
     position: fixed;
-    bottom: 64px;
+    bottom: calc(62px + env(safe-area-inset-bottom, 0px));
     left: 8px;
     right: 8px;
-    background: rgba(22, 22, 34, 0.96);
+    background: rgba(22, 22, 34, 0.95);
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
-    border: 1px solid rgba(255, 255, 255, 0.12);
+    border: 1px solid rgba(255, 255, 255, 0.14);
     border-radius: 12px;
     box-shadow: 0 8px 24px rgba(0, 0, 0, 0.7);
     z-index: 1400;
     overflow: hidden;
     cursor: pointer;
+    user-select: none;
+    touch-action: pan-y pan-x;
+    transition: transform 0.25s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.25s ease;
+  }
+  .mobile-mini-player:active {
+    background: rgba(28, 28, 44, 0.98);
   }
   .mmp-progress {
     height: 2.5px;
@@ -2688,7 +2739,7 @@ body {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 7px 12px;
+    padding: 8px 12px;
   }
   .mmp-left {
     display: flex;
@@ -2698,14 +2749,15 @@ body {
     min-width: 0;
   }
   .mmp-thumb {
-    width: 38px;
-    height: 38px;
+    width: 40px;
+    height: 40px;
     border-radius: 6px;
     object-fit: cover;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
   }
   .mmp-thumb-placeholder {
-    width: 38px;
-    height: 38px;
+    width: 40px;
+    height: 40px;
     border-radius: 6px;
     background: var(--bg-card);
     display: flex;
@@ -2740,9 +2792,13 @@ body {
     gap: 6px;
   }
   .mmp-btn {
-    width: 34px;
-    height: 34px;
+    width: 36px;
+    height: 36px;
     font-size: 0.95rem;
+    touch-action: manipulation;
+  }
+  .mmp-btn:active {
+    transform: scale(0.9);
   }
   .mmp-play-btn {
     background: #fff;
@@ -2750,18 +2806,21 @@ body {
     border-radius: 50%;
   }
 
-  /* 7. FULLSCREEN MOBILE SLIDE-UP PLAYER SHEET */
+  /* 7. FULLSCREEN MOBILE SLIDE-UP PLAYER SHEET (Native Gestures Enabled) */
   .mobile-player-sheet {
     display: flex !important;
     flex-direction: column;
     position: fixed;
     inset: 0;
-    background: linear-gradient(180deg, #1e1b4b 0%, #0c0a1f 35%, #07070a 100%);
+    background: linear-gradient(180deg, #1c1836 0%, #0d0a1a 40%, #060608 100%);
     z-index: 2100;
     transform: translateY(100%);
     transition: transform 0.35s cubic-bezier(0.32, 0.72, 0, 1);
-    padding: 12px 20px 30px 20px;
+    padding: calc(12px + env(safe-area-inset-top, 0px)) 20px calc(24px + env(safe-area-inset-bottom, 0px)) 20px;
     overflow-y: auto;
+    overscroll-behavior-y: contain;
+    user-select: none;
+    touch-action: pan-y;
   }
   .mobile-player-sheet.open {
     transform: translateY(0);
@@ -2769,20 +2828,27 @@ body {
   .mps-handle-bar {
     display: flex;
     justify-content: center;
-    padding: 6px 0 10px 0;
-    cursor: pointer;
+    padding: 6px 0 12px 0;
+    cursor: grab;
+    touch-action: none;
   }
   .mps-pill {
-    width: 36px;
-    height: 4px;
+    width: 40px;
+    height: 4.5px;
     border-radius: var(--radius-full);
-    background: rgba(255, 255, 255, 0.3);
+    background: rgba(255, 255, 255, 0.35);
+    transition: background 0.2s ease, transform 0.2s ease;
+  }
+  .mps-handle-bar:active .mps-pill {
+    background: rgba(255, 255, 255, 0.6);
+    transform: scaleX(1.15);
   }
   .mps-top-nav {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 20px;
+    margin-bottom: 18px;
+    touch-action: manipulation;
   }
   .mps-header-title {
     text-align: center;
@@ -2807,92 +2873,195 @@ body {
     margin: 0 auto;
     width: 100%;
   }
+
+  /* Album Artwork with Ambient Glow & Swipe/Double-Tap Gestures */
   .mps-artwork-container {
     width: 100%;
     aspect-ratio: 1;
     max-width: 320px;
-    margin: 0 auto 20px auto;
-    border-radius: 16px;
-    overflow: hidden;
-    box-shadow: 0 16px 36px rgba(0, 0, 0, 0.7);
+    margin: 0 auto 18px auto;
+    border-radius: 18px;
+    position: relative;
+    box-shadow: 0 18px 40px rgba(0, 0, 0, 0.75);
     background: var(--bg-card);
     display: flex;
     align-items: center;
     justify-content: center;
+    touch-action: pan-y;
+    will-change: transform;
+    cursor: grab;
+  }
+  .mps-ambient-glow {
+    position: absolute;
+    inset: -10px;
+    border-radius: 24px;
+    background: radial-gradient(circle, rgba(139, 92, 246, 0.35) 0%, rgba(236, 72, 153, 0.2) 60%, transparent 80%);
+    filter: blur(28px);
+    z-index: 0;
+    pointer-events: none;
+    opacity: 0.7;
+    transition: opacity 0.5s ease;
   }
   .mps-cover-img {
     width: 100%;
     height: 100%;
     object-fit: cover;
+    border-radius: 18px;
+    position: relative;
+    z-index: 1;
+    pointer-events: none;
   }
   .mps-placeholder {
     font-size: 3.5rem;
     color: var(--accent-light);
+    position: relative;
+    z-index: 1;
+  }
+
+  /* Double Tap Animated Heart Burst */
+  .heart-pop {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(0);
+    font-size: 4.8rem;
+    color: #ec4899;
+    filter: drop-shadow(0 0 25px rgba(236, 72, 153, 0.9));
+    pointer-events: none;
+    z-index: 20;
+    animation: heartPopAnim 0.75s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+  }
+  @keyframes heartPopAnim {
+    0% { transform: translate(-50%, -50%) scale(0); opacity: 0; }
+    35% { transform: translate(-50%, -50%) scale(1.35); opacity: 1; }
+    65% { transform: translate(-50%, -50%) scale(1.1); opacity: 0.95; }
+    100% { transform: translate(-50%, -50%) scale(1.6); opacity: 0; }
   }
 
   .mps-info-row {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 16px;
+    margin-bottom: 14px;
   }
   .mps-texts h2 {
-    font-size: 1.25rem;
+    font-size: 1.22rem;
     font-weight: 800;
     color: #fff;
     margin-bottom: 3px;
+    line-height: 1.25;
   }
   .mps-texts p {
-    font-size: 0.88rem;
+    font-size: 0.86rem;
     color: var(--text-secondary);
   }
 
+  /* Touch Seekbar with Live Drag Tooltip */
   .mps-playback-bar {
     width: 100%;
     display: flex;
     flex-direction: column;
-    margin-bottom: 16px;
+    margin-bottom: 14px;
+  }
+  .mps-playback-bar .progress-container {
+    height: 24px;
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    touch-action: none;
+    position: relative;
+  }
+  .mps-playback-bar .progress-container::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    height: 4px;
+    border-radius: var(--radius-full);
+    background: rgba(255, 255, 255, 0.18);
+  }
+  .mps-playback-bar .progress-fill {
+    height: 4px;
+    border-radius: var(--radius-full);
+  }
+  .mps-playback-bar .progress-thumb {
+    width: 14px;
+    height: 14px;
+    opacity: 1;
+    transform: translate(-50%, -50%);
+  }
+  .mps-seek-tooltip {
+    position: absolute;
+    bottom: 26px;
+    left: 0;
+    transform: translateX(-50%);
+    background: rgba(14, 14, 24, 0.95);
+    color: #fff;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.6);
+    padding: 3px 8px;
+    border-radius: 6px;
+    font-size: 0.74rem;
+    font-weight: 700;
+    pointer-events: none;
+    white-space: nowrap;
+    display: none;
+    z-index: 25;
+  }
+  .mps-seek-tooltip.visible {
+    display: block;
   }
   .mps-times {
     display: flex;
     justify-content: space-between;
     font-size: 0.72rem;
     color: var(--text-muted);
-    margin-top: 6px;
+    margin-top: 4px;
   }
 
+  /* Mobile Controls Row */
   .mps-controls-row {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 24px;
-    padding: 0 6px;
+    margin-bottom: 20px;
+    padding: 0 4px;
+    touch-action: manipulation;
   }
   .ctrl-btn-big {
     font-size: 1.5rem;
     width: 48px;
     height: 48px;
   }
+  .ctrl-btn-big:active {
+    transform: scale(0.88);
+  }
   .btn-play-pause-huge {
-    width: 64px;
-    height: 64px;
+    width: 66px;
+    height: 66px;
     border-radius: 50%;
     background: #fff;
     color: #000;
     border: none;
-    font-size: 1.5rem;
+    font-size: 1.55rem;
     display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    box-shadow: 0 6px 20px rgba(255, 255, 255, 0.25);
+    box-shadow: 0 8px 24px rgba(255, 255, 255, 0.3);
+    touch-action: manipulation;
+    transition: transform 0.15s cubic-bezier(0.2, 0.8, 0.2, 1);
+  }
+  .btn-play-pause-huge:active {
+    transform: scale(0.9);
+    box-shadow: 0 4px 12px rgba(255, 255, 255, 0.2);
   }
 
   .mps-tools-row {
     display: flex;
     justify-content: space-around;
     align-items: center;
-    padding-top: 10px;
+    padding-top: 12px;
     border-top: 1px solid rgba(255, 255, 255, 0.08);
   }
   .mps-tool-btn {
@@ -2906,17 +3075,107 @@ body {
     font-size: 0.72rem;
     cursor: pointer;
     font-family: inherit;
+    touch-action: manipulation;
+  }
+  .mps-tool-btn:active {
+    transform: scale(0.92);
+    color: #fff;
   }
   .mps-tool-btn i {
-    font-size: 1.1rem;
+    font-size: 1.15rem;
   }
   .mps-tool-btn:hover {
     color: #fff;
   }
+
+  /* 8. DRAWER BOTTOM SHEETS ON MOBILE */
+  .drawer-overlay {
+    align-items: flex-end !important;
+    justify-content: center !important;
+    padding: 0 !important;
+  }
+  .drawer-card {
+    width: 100% !important;
+    max-width: 100% !important;
+    max-height: 84dvh !important;
+    border-radius: 24px 24px 0 0 !important;
+    border-left: none !important;
+    border-top: 1px solid rgba(255, 255, 255, 0.16) !important;
+    animation: drawerSheetUp 0.32s cubic-bezier(0.32, 0.72, 0, 1) !important;
+    padding-bottom: max(16px, env(safe-area-inset-bottom));
+  }
+  @keyframes drawerSheetUp {
+    from { transform: translateY(100%); }
+    to { transform: translateY(0); }
+  }
+  .drawer-handle-bar {
+    width: 100%;
+    display: flex !important;
+    justify-content: center;
+    padding: 10px 0 4px 0;
+    cursor: grab;
+    touch-action: none;
+  }
+  .drawer-pill {
+    width: 38px;
+    height: 4px;
+    border-radius: var(--radius-full);
+    background: rgba(255, 255, 255, 0.32);
+    transition: background 0.2s ease;
+  }
+  .drawer-handle-bar:active .drawer-pill {
+    background: rgba(255, 255, 255, 0.6);
+  }
+  .lyrics-card {
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+  .lyrics-container {
+    padding: 16px 18px !important;
+    gap: 14px !important;
+  }
+  .lyric-line {
+    font-size: 1.15rem !important;
+  }
+  .lyric-line.active {
+    font-size: 1.35rem !important;
+  }
 }
 
+/* Compact phones height optimization (e.g. iPhone SE / smaller Androids) */
+@media (max-height: 720px) and (max-width: 768px) {
+  .mps-artwork-container {
+    max-width: 210px !important;
+    margin-bottom: 10px !important;
+  }
+  .mps-top-nav {
+    margin-bottom: 8px !important;
+  }
+  .mps-info-row {
+    margin-bottom: 8px !important;
+  }
+  .mps-texts h2 {
+    font-size: 1.05rem !important;
+  }
+  .mps-playback-bar {
+    margin-bottom: 8px !important;
+  }
+  .mps-controls-row {
+    margin-bottom: 12px !important;
+  }
+  .btn-play-pause-huge {
+    width: 56px !important;
+    height: 56px !important;
+    font-size: 1.35rem !important;
+  }
+  .ctrl-btn-big {
+    width: 40px !important;
+    height: 40px !important;
+    font-size: 1.25rem !important;
+  }
+}
 
-/* ===== ADMIN DASHBOARD ===== */
+/* ===== ADMIN DASHBOARD RESPONSIVE ===== */
 .admin-container {
   padding: 32px;
   max-width: 1280px;
@@ -2940,6 +3199,28 @@ body {
 @media (max-width: 900px) {
   .admin-grid { grid-template-columns: 1fr; }
 }
+@media (max-width: 640px) {
+  .admin-container {
+    padding: 16px 12px;
+  }
+  .admin-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+    margin-bottom: 20px;
+  }
+  .form-card {
+    padding: 18px 14px;
+  }
+  .table-container {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  table {
+    min-width: 480px;
+  }
+}
+
 .form-card {
   background: var(--bg-surface);
   padding: 28px;

@@ -482,7 +482,8 @@
 
     <!-- QUEUE DRAWER (Spotify Feature) -->
     <div class="drawer-overlay hidden" id="queueDrawer">
-        <div class="drawer-card">
+        <div class="drawer-card" id="queueDrawerCard">
+            <div class="drawer-handle-bar" id="queueHandleBar"><div class="drawer-pill"></div></div>
             <div class="drawer-header">
                 <div class="drawer-title-wrap">
                     <i class="fas fa-list-ol"></i>
@@ -505,7 +506,8 @@
 
     <!-- SYNCED LYRICS DRAWER / KARAOKE MODAL (Spotify Feature) -->
     <div class="drawer-overlay hidden" id="lyricsDrawer">
-        <div class="drawer-card lyrics-card">
+        <div class="drawer-card lyrics-card" id="lyricsDrawerCard">
+            <div class="drawer-handle-bar" id="lyricsHandleBar"><div class="drawer-pill"></div></div>
             <div class="drawer-header">
                 <div class="drawer-title-wrap">
                     <i class="fas fa-microphone-lines"></i>
@@ -535,8 +537,9 @@
         </div>
 
         <div class="mps-content">
-            <!-- Vinyl / Cover View Toggle in Fullscreen -->
+            <!-- Vinyl / Cover View Toggle in Fullscreen with Ambient Glow -->
             <div class="mps-artwork-container" id="mpsArtworkContainer">
+                <div class="mps-ambient-glow" id="mpsAmbientGlow"></div>
                 <img src="" alt="" id="mpsCoverImg" class="mps-cover-img">
                 <div class="mps-placeholder" id="mpsPlaceholder"><i class="fas fa-music"></i></div>
             </div>
@@ -551,11 +554,12 @@
                 </button>
             </div>
 
-            <!-- Mobile Playback Bar -->
+            <!-- Mobile Playback Bar with Scrub Tooltip -->
             <div class="playback-bar mps-playback-bar">
                 <div class="progress-container" id="mpsProgressCont">
                     <div class="progress-fill" id="mpsProgressBar"></div>
                     <div class="progress-thumb" id="mpsProgressHandle"></div>
+                    <div class="mps-seek-tooltip" id="mpsSeekTooltip">0:00</div>
                 </div>
                 <div class="mps-times">
                     <span id="mpsCurrentTime">0:00</span>

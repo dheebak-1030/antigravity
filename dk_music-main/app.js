@@ -120,6 +120,8 @@ const mmpProgressBar       = document.getElementById('mmpProgressBar');
 const mobilePlayerSheet    = document.getElementById('mobilePlayerSheet');
 const mpsHandleBar         = document.getElementById('mpsHandleBar');
 const btnCloseMobileSheet  = document.getElementById('btnCloseMobileSheet');
+const mpsArtworkContainer  = document.getElementById('mpsArtworkContainer');
+const mpsAmbientGlow       = document.getElementById('mpsAmbientGlow');
 const mpsCoverImg          = document.getElementById('mpsCoverImg');
 const mpsPlaceholder       = document.getElementById('mpsPlaceholder');
 const mpsTitle             = document.getElementById('mpsTitle');
@@ -134,12 +136,18 @@ const btnMpsRepeat         = document.getElementById('btnMpsRepeat');
 const btnMpsLyrics         = document.getElementById('btnMpsLyrics');
 const btnMpsDownload       = document.getElementById('btnMpsDownload');
 const btnMps3D             = document.getElementById('btnMps3D');
+const btnMpsQueue          = document.getElementById('btnMpsQueue');
 const mpsProgressCont      = document.getElementById('mpsProgressCont');
 const mpsProgressBar       = document.getElementById('mpsProgressBar');
-const mpsProgressHandle     = document.getElementById('mpsProgressHandle');
+const mpsProgressHandle    = document.getElementById('mpsProgressHandle');
+const mpsSeekTooltip       = document.getElementById('mpsSeekTooltip');
 const mpsCurrentTime       = document.getElementById('mpsCurrentTime');
 const mpsTotalTime         = document.getElementById('mpsTotalTime');
 const mpsPlaylistSource    = document.getElementById('mpsPlaylistSource');
+const queueHandleBar       = document.getElementById('queueHandleBar');
+const lyricsHandleBar      = document.getElementById('lyricsHandleBar');
+const queueDrawerCard      = document.getElementById('queueDrawerCard');
+const lyricsDrawerCard     = document.getElementById('lyricsDrawerCard');
 
 // Local file input
 const localAudioFileInput  = document.getElementById('localAudioFileInput');
@@ -1003,11 +1011,13 @@ audioEl.addEventListener('timeupdate', () => {
     if (currentTimeEl) currentTimeEl.textContent = fmt(currentTime);
     if (totalTimeEl) totalTimeEl.textContent = fmt(duration);
 
-    // Mobile mini player & sheet bars
-    if (mmpProgressBar) mmpProgressBar.style.width = `${pct}%`;
-    if (mpsProgressBar) mpsProgressBar.style.width = `${pct}%`;
-    if (mpsProgressHandle) mpsProgressHandle.style.left = `${pct}%`;
-    if (mpsCurrentTime) mpsCurrentTime.textContent = fmt(currentTime);
+    // Mobile mini player & sheet bars (respect active scrub state)
+    if (!isScrubbingMps) {
+      if (mmpProgressBar) mmpProgressBar.style.width = `${pct}%`;
+      if (mpsProgressBar) mpsProgressBar.style.width = `${pct}%`;
+      if (mpsProgressHandle) mpsProgressHandle.style.left = `${pct}%`;
+      if (mpsCurrentTime) mpsCurrentTime.textContent = fmt(currentTime);
+    }
     if (mpsTotalTime) mpsTotalTime.textContent = fmt(duration);
 
     // Synced Lyrics update
@@ -1028,16 +1038,6 @@ function seek(e) {
   audioEl.currentTime = pct * audioEl.duration;
 }
 progressCont?.addEventListener('click', seek);
-
-// Mobile Sheet Seek
-function seekMobile(e) {
-  if (!mpsProgressCont || !audioEl.duration) return;
-  const rect = mpsProgressCont.getBoundingClientRect();
-  const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-  const pct = Math.max(0, Math.min(1, (clientX - rect.left) / rect.width));
-  audioEl.currentTime = pct * audioEl.duration;
-}
-mpsProgressCont?.addEventListener('click', seekMobile);
 
 // Volume Controls
 function setVolume(vol) {
@@ -1067,7 +1067,77 @@ muteIcon?.addEventListener('click', () => {
 });
 setVolume(0.8);
 
-// ── Mobile UI Engine & Gesture Handlers ─────────────────────
+// ── Mobile Touch, Gesture & Haptic Engine ───────────────────
+function triggerHaptic(type = 'light') {
+  if (typeof navigator !== 'undefined' && navigator.vibrate) {
+    try {
+      if (type === 'light') navigator.vibrate(14);
+      else if (type === 'medium') navigator.vibrate(28);
+      else if (type === 'double') navigator.vibrate([15, 30, 20]);
+    } catch (e) {
+      // Fallback silently if vibration not allowed
+    }
+  }
+}
+
+let isScrubbingMps = false;
+
+// Touch seek bar scrubber
+function updateMpsScrub(clientX) {
+  if (!mpsProgressCont || !audioEl.duration) return 0;
+  const rect = mpsProgressCont.getBoundingClientRect();
+  const pct = Math.max(0, Math.min(1, (clientX - rect.left) / rect.width));
+  const scrubTime = pct * audioEl.duration;
+
+  if (mpsProgressBar) mpsProgressBar.style.width = `${pct * 100}%`;
+  if (mpsProgressHandle) mpsProgressHandle.style.left = `${pct * 100}%`;
+  if (mpsCurrentTime) mpsCurrentTime.textContent = fmt(scrubTime);
+
+  if (mpsSeekTooltip) {
+    mpsSeekTooltip.textContent = fmt(scrubTime);
+    mpsSeekTooltip.style.left = `${pct * 100}%`;
+    mpsSeekTooltip.classList.add('visible');
+  }
+  return scrubTime;
+}
+
+mpsProgressCont?.addEventListener('click', e => {
+  if (!audioEl.duration) return;
+  const targetTime = updateMpsScrub(e.clientX);
+  audioEl.currentTime = targetTime;
+  if (mpsSeekTooltip) mpsSeekTooltip.classList.remove('visible');
+});
+
+mpsProgressCont?.addEventListener('touchstart', e => {
+  isScrubbingMps = true;
+  triggerHaptic('light');
+  updateMpsScrub(e.touches[0].clientX);
+}, { passive: true });
+
+mpsProgressCont?.addEventListener('touchmove', e => {
+  if (!isScrubbingMps) return;
+  updateMpsScrub(e.touches[0].clientX);
+  if (e.cancelable) e.preventDefault();
+}, { passive: false });
+
+mpsProgressCont?.addEventListener('touchend', e => {
+  if (!isScrubbingMps) return;
+  const clientX = e.changedTouches ? e.changedTouches[0].clientX : e.clientX;
+  const targetTime = updateMpsScrub(clientX);
+  if (typeof targetTime === 'number' && !isNaN(targetTime)) {
+    audioEl.currentTime = targetTime;
+  }
+  if (mpsSeekTooltip) mpsSeekTooltip.classList.remove('visible');
+  isScrubbingMps = false;
+  triggerHaptic('light');
+});
+
+mpsProgressCont?.addEventListener('touchcancel', () => {
+  if (mpsSeekTooltip) mpsSeekTooltip.classList.remove('visible');
+  isScrubbingMps = false;
+});
+
+// Update Mobile Player UI & Ambient Glow
 function updateMobilePlayerUI(song) {
   if (!song) return;
 
@@ -1086,6 +1156,11 @@ function updateMobilePlayerUI(song) {
   // 2. Mobile Fullscreen Sheet
   if (mpsTitle) mpsTitle.textContent = song.title;
   if (mpsArtist) mpsArtist.textContent = song.artist;
+  if (mpsPlaylistSource) {
+    const activeSection = document.querySelector('.mobile-nav-item.active')?.dataset.section || 'All Tracks';
+    mpsPlaylistSource.textContent = activeSection.charAt(0).toUpperCase() + activeSection.slice(1);
+  }
+
   if (song.cover_url && mpsCoverImg) {
     mpsCoverImg.src = song.cover_url;
     mpsCoverImg.style.display = 'block';
@@ -1100,55 +1175,362 @@ function updateMobilePlayerUI(song) {
   if (btnMpsLike) btnMpsLike.innerHTML = `<i class="${isLiked ? 'fas' : 'far'} fa-heart" style="${isLiked ? 'color:#ec4899;' : ''}"></i>`;
 }
 
-// Open Fullscreen Mobile Sheet when tapping Mini Player
-mmpTapArea?.addEventListener('click', () => {
-  if (mobilePlayerSheet) mobilePlayerSheet.classList.add('open');
-});
+// ── 1. Interactive Drag-To-Dismiss on Mobile Player Sheet ─────
+let sheetStartY = 0;
+let sheetStartX = 0;
+let isDraggingSheet = false;
+let sheetDeltaY = 0;
 
-// Close Mobile Sheet
+function handleSheetTouchStart(e) {
+  if (e.target.closest('button') || e.target.closest('input') || e.target.closest('#mpsProgressCont')) return;
+  sheetStartY = e.touches[0].clientY;
+  sheetStartX = e.touches[0].clientX;
+  sheetDeltaY = 0;
+  isDraggingSheet = true;
+  mobilePlayerSheet.style.transition = 'none';
+}
+
+function handleSheetTouchMove(e) {
+  if (!isDraggingSheet) return;
+  const dy = e.touches[0].clientY - sheetStartY;
+  const dx = e.touches[0].clientX - sheetStartX;
+
+  // Downward drag dominant
+  if (dy > 0 && dy > Math.abs(dx)) {
+    sheetDeltaY = dy;
+    mobilePlayerSheet.style.transform = `translateY(${dy}px)`;
+    if (e.cancelable) e.preventDefault();
+  }
+}
+
+function handleSheetTouchEnd() {
+  if (!isDraggingSheet) return;
+  isDraggingSheet = false;
+  mobilePlayerSheet.style.transition = 'transform 0.32s cubic-bezier(0.32, 0.72, 0, 1)';
+
+  if (sheetDeltaY > 90) {
+    // Dismiss sheet
+    mobilePlayerSheet.style.transform = 'translateY(100%)';
+    triggerHaptic('medium');
+    setTimeout(() => {
+      mobilePlayerSheet.classList.remove('open');
+      mobilePlayerSheet.style.transform = '';
+      mobilePlayerSheet.style.transition = '';
+    }, 320);
+  } else {
+    // Snap back
+    mobilePlayerSheet.style.transform = 'translateY(0)';
+    setTimeout(() => {
+      mobilePlayerSheet.style.transform = '';
+      mobilePlayerSheet.style.transition = '';
+    }, 320);
+  }
+  sheetDeltaY = 0;
+}
+
+mpsHandleBar?.addEventListener('touchstart', handleSheetTouchStart, { passive: true });
+mpsHandleBar?.addEventListener('touchmove', handleSheetTouchMove, { passive: false });
+mpsHandleBar?.addEventListener('touchend', handleSheetTouchEnd);
+
+document.querySelector('.mps-top-nav')?.addEventListener('touchstart', handleSheetTouchStart, { passive: true });
+document.querySelector('.mps-top-nav')?.addEventListener('touchmove', handleSheetTouchMove, { passive: false });
+document.querySelector('.mps-top-nav')?.addEventListener('touchend', handleSheetTouchEnd);
+
 btnCloseMobileSheet?.addEventListener('click', () => {
+  triggerHaptic('light');
   mobilePlayerSheet?.classList.remove('open');
 });
 mpsHandleBar?.addEventListener('click', () => {
+  triggerHaptic('light');
   mobilePlayerSheet?.classList.remove('open');
+});
+
+// ── 2. Swipe Left/Right & Double-Tap Heart on Artwork ────────
+let artTouchStartX = 0;
+let artTouchStartY = 0;
+let artDiffX = 0;
+let artLastTapTime = 0;
+let isArtDragging = false;
+
+function spawnHeartPop() {
+  if (!mpsArtworkContainer) return;
+  const heart = document.createElement('div');
+  heart.className = 'heart-pop';
+  heart.innerHTML = '<i class="fas fa-heart"></i>';
+  mpsArtworkContainer.appendChild(heart);
+  triggerHaptic('double');
+  setTimeout(() => heart.remove(), 750);
+}
+
+mpsArtworkContainer?.addEventListener('touchstart', e => {
+  const now = Date.now();
+  if (now - artLastTapTime < 320) {
+    // Double-tap to Like
+    const currentSong = currentQueue[currentSongIndex];
+    if (currentSong) {
+      if (!likedSongs.has(currentSong.id)) {
+        toggleLike(currentSong.id);
+      }
+      spawnHeartPop();
+    }
+    artLastTapTime = 0;
+    return;
+  }
+  artLastTapTime = now;
+
+  artTouchStartX = e.touches[0].clientX;
+  artTouchStartY = e.touches[0].clientY;
+  artDiffX = 0;
+  isArtDragging = true;
+  mpsArtworkContainer.style.transition = 'none';
+}, { passive: true });
+
+mpsArtworkContainer?.addEventListener('touchmove', e => {
+  if (!isArtDragging) return;
+  const dx = e.touches[0].clientX - artTouchStartX;
+  const dy = e.touches[0].clientY - artTouchStartY;
+
+  // Horizontal swipe intent
+  if (Math.abs(dx) > Math.abs(dy)) {
+    artDiffX = dx;
+    mpsArtworkContainer.style.transform = `translateX(${dx * 0.42}px) rotate(${dx * 0.03}deg)`;
+    mpsArtworkContainer.style.opacity = `${Math.max(0.65, 1 - Math.abs(dx) / 500)}`;
+    if (e.cancelable) e.preventDefault();
+  }
+}, { passive: false });
+
+mpsArtworkContainer?.addEventListener('touchend', () => {
+  if (!isArtDragging) return;
+  isArtDragging = false;
+  mpsArtworkContainer.style.transition = 'transform 0.28s ease, opacity 0.28s ease';
+
+  if (artDiffX < -60) {
+    // Swiped left -> NEXT TRACK
+    triggerHaptic('light');
+    mpsArtworkContainer.style.transform = 'translateX(-120px) rotate(-8deg)';
+    mpsArtworkContainer.style.opacity = '0';
+    setTimeout(() => {
+      nextSong();
+      mpsArtworkContainer.style.transition = 'none';
+      mpsArtworkContainer.style.transform = 'translateX(90px) scale(0.95)';
+      setTimeout(() => {
+        mpsArtworkContainer.style.transition = 'transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.3s ease';
+        mpsArtworkContainer.style.transform = 'translateX(0) scale(1)';
+        mpsArtworkContainer.style.opacity = '1';
+      }, 30);
+    }, 150);
+  } else if (artDiffX > 60) {
+    // Swiped right -> PREVIOUS TRACK
+    triggerHaptic('light');
+    mpsArtworkContainer.style.transform = 'translateX(120px) rotate(8deg)';
+    mpsArtworkContainer.style.opacity = '0';
+    setTimeout(() => {
+      prevSong();
+      mpsArtworkContainer.style.transition = 'none';
+      mpsArtworkContainer.style.transform = 'translateX(-90px) scale(0.95)';
+      setTimeout(() => {
+        mpsArtworkContainer.style.transition = 'transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.3s ease';
+        mpsArtworkContainer.style.transform = 'translateX(0) scale(1)';
+        mpsArtworkContainer.style.opacity = '1';
+      }, 30);
+    }, 150);
+  } else {
+    // Snap back
+    mpsArtworkContainer.style.transform = 'translateX(0) rotate(0deg)';
+    mpsArtworkContainer.style.opacity = '1';
+  }
+  artDiffX = 0;
+});
+
+// ── 3. Swipe & Tap Gestures on Docked Mini-Player ────────────
+let mmpStartX = 0;
+let mmpStartY = 0;
+let mmpDiffX = 0;
+let mmpDiffY = 0;
+let isMmpTracking = false;
+
+mobileMiniPlayer?.addEventListener('touchstart', e => {
+  if (e.target.closest('button')) return;
+  mmpStartX = e.touches[0].clientX;
+  mmpStartY = e.touches[0].clientY;
+  mmpDiffX = 0;
+  mmpDiffY = 0;
+  isMmpTracking = true;
+}, { passive: true });
+
+mobileMiniPlayer?.addEventListener('touchmove', e => {
+  if (!isMmpTracking) return;
+  mmpDiffX = e.touches[0].clientX - mmpStartX;
+  mmpDiffY = e.touches[0].clientY - mmpStartY;
+
+  // Horizontal feedback tilt
+  if (Math.abs(mmpDiffX) > Math.abs(mmpDiffY) && Math.abs(mmpDiffX) > 12) {
+    mobileMiniPlayer.style.transform = `translateX(${mmpDiffX * 0.3}px)`;
+    if (e.cancelable) e.preventDefault();
+  }
+}, { passive: false });
+
+mobileMiniPlayer?.addEventListener('touchend', e => {
+  if (!isMmpTracking) return;
+  isMmpTracking = false;
+  mobileMiniPlayer.style.transform = '';
+
+  // Swipe UP -> Open Fullscreen Sheet
+  if (mmpDiffY < -40 && Math.abs(mmpDiffY) > Math.abs(mmpDiffX)) {
+    triggerHaptic('light');
+    mobilePlayerSheet?.classList.add('open');
+    return;
+  }
+
+  // Swipe LEFT -> Next Track
+  if (mmpDiffX < -50) {
+    triggerHaptic('light');
+    nextSong();
+    return;
+  }
+
+  // Swipe RIGHT -> Previous Track
+  if (mmpDiffX > 50) {
+    triggerHaptic('light');
+    prevSong();
+    return;
+  }
+
+  // Tap on Mini-Player (if barely moved and not clicking buttons)
+  if (Math.abs(mmpDiffX) < 12 && Math.abs(mmpDiffY) < 12) {
+    if (!e.target.closest('button')) {
+      triggerHaptic('light');
+      mobilePlayerSheet?.classList.add('open');
+    }
+  }
 });
 
 // Mobile Mini-Player Buttons
 btnMmpPlayPause?.addEventListener('click', e => {
   e.stopPropagation();
+  triggerHaptic('light');
   togglePlayPause();
 });
 btnMmpLike?.addEventListener('click', e => {
   e.stopPropagation();
+  triggerHaptic('light');
   const currentSong = currentQueue[currentSongIndex];
   if (currentSong) toggleLike(currentSong.id);
 });
 
-// Mobile Sheet Buttons
-btnMpsPlayPause?.addEventListener('click', togglePlayPause);
-btnMpsNext?.addEventListener('click', nextSong);
-btnMpsPrev?.addEventListener('click', prevSong);
-btnMpsShuffle?.addEventListener('click', () => btnShuffle?.click());
-btnMpsRepeat?.addEventListener('click', () => btnRepeat?.click());
+// Mobile Sheet Controls
+btnMpsPlayPause?.addEventListener('click', () => {
+  triggerHaptic('light');
+  togglePlayPause();
+});
+btnMpsNext?.addEventListener('click', () => {
+  triggerHaptic('light');
+  nextSong();
+});
+btnMpsPrev?.addEventListener('click', () => {
+  triggerHaptic('light');
+  prevSong();
+});
+btnMpsShuffle?.addEventListener('click', () => {
+  triggerHaptic('light');
+  btnShuffle?.click();
+});
+btnMpsRepeat?.addEventListener('click', () => {
+  triggerHaptic('light');
+  btnRepeat?.click();
+});
 btnMpsLike?.addEventListener('click', () => {
+  triggerHaptic('light');
   const currentSong = currentQueue[currentSongIndex];
-  if (currentSong) toggleLike(currentSong.id);
+  if (currentSong) {
+    toggleLike(currentSong.id);
+    if (likedSongs.has(currentSong.id)) spawnHeartPop();
+  }
 });
 btnMpsLyrics?.addEventListener('click', () => {
+  triggerHaptic('light');
   lyricsDrawer?.classList.remove('hidden');
 });
 btnMpsDownload?.addEventListener('click', () => {
+  triggerHaptic('light');
   const currentSong = currentQueue[currentSongIndex];
   if (currentSong) toggleOfflineDownload(currentSong);
 });
 btnMps3D?.addEventListener('click', () => {
+  triggerHaptic('light');
   mobilePlayerSheet?.classList.remove('open');
   navigateTo('visualizer3d');
 });
+btnMpsQueue?.addEventListener('click', () => {
+  triggerHaptic('light');
+  renderQueueDrawer();
+  queueDrawer?.classList.remove('hidden');
+});
 
-// Mobile Bottom Navigation Tabs
+// ── 4. Pull-to-Dismiss on Mobile Bottom Sheets (Drawers) ─────
+function setupDrawerSwipeDismiss(drawerEl, handleEl, cardEl) {
+  if (!drawerEl || !handleEl || !cardEl) return;
+  let startY = 0;
+  let currentY = 0;
+  let isDragging = false;
+
+  handleEl.addEventListener('touchstart', e => {
+    startY = e.touches[0].clientY;
+    currentY = 0;
+    isDragging = true;
+    cardEl.style.transition = 'none';
+  }, { passive: true });
+
+  handleEl.addEventListener('touchmove', e => {
+    if (!isDragging) return;
+    const dy = e.touches[0].clientY - startY;
+    if (dy > 0) {
+      currentY = dy;
+      cardEl.style.transform = `translateY(${dy}px)`;
+      if (e.cancelable) e.preventDefault();
+    }
+  }, { passive: false });
+
+  handleEl.addEventListener('touchend', () => {
+    if (!isDragging) return;
+    isDragging = false;
+    cardEl.style.transition = 'transform 0.28s cubic-bezier(0.32, 0.72, 0, 1)';
+    if (currentY > 80) {
+      triggerHaptic('medium');
+      cardEl.style.transform = 'translateY(100%)';
+      setTimeout(() => {
+        drawerEl.classList.add('hidden');
+        cardEl.style.transform = '';
+        cardEl.style.transition = '';
+      }, 280);
+    } else {
+      cardEl.style.transform = 'translateY(0)';
+      setTimeout(() => {
+        cardEl.style.transform = '';
+        cardEl.style.transition = '';
+      }, 280);
+    }
+    currentY = 0;
+  });
+}
+
+setupDrawerSwipeDismiss(queueDrawer, queueHandleBar, queueDrawerCard);
+setupDrawerSwipeDismiss(lyricsDrawer, lyricsHandleBar, lyricsDrawerCard);
+
+// Backdrop clicks close drawers
+queueDrawer?.addEventListener('click', e => {
+  if (e.target === queueDrawer) queueDrawer.classList.add('hidden');
+});
+lyricsDrawer?.addEventListener('click', e => {
+  if (e.target === lyricsDrawer) lyricsDrawer.classList.add('hidden');
+});
+
+// Mobile Bottom Navigation Tabs with Haptic & Highlight
 document.querySelectorAll('.mobile-nav-item').forEach(item => {
   item.addEventListener('click', () => {
+    triggerHaptic('light');
+    document.querySelectorAll('.mobile-nav-item').forEach(nav => nav.classList.remove('active'));
+    item.classList.add('active');
     navigateTo(item.dataset.section);
   });
 });
@@ -1276,10 +1658,6 @@ function renderQueueDrawer() {
 }
 
 btnQueue?.addEventListener('click', () => {
-  renderQueueDrawer();
-  queueDrawer?.classList.remove('hidden');
-});
-document.getElementById('btnMpsQueue')?.addEventListener('click', () => {
   renderQueueDrawer();
   queueDrawer?.classList.remove('hidden');
 });
