@@ -311,7 +311,7 @@ class DK_3DAudioEngine {
 
 // ── 3D Card Parallax Tilt Effect ─────────────────────────────
 function init3DCardTilt() {
-  document.querySelectorAll('.album-card, .playlist-card, .quick-card, .hero-banner').forEach(card => {
+  document.querySelectorAll('.album-card, .playlist-card, .quick-card, .hero-banner, .home-3d-hero').forEach(card => {
     if (card._hasTilt) return;
     card._hasTilt = true;
 

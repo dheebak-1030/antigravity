@@ -145,14 +145,60 @@
 
             <!-- 1. HOME SECTION -->
             <section class="content-section active" id="section-home">
-                <div class="greeting-row">
-                    <div>
-                        <h1 class="greeting-text" id="greetingText">Good Evening</h1>
-                        <span class="greeting-sub">Spotify vibes &bull; 100% Copyright-Free &bull; Works Offline</span>
+                <!-- NEW 3D INTERACTIVE HERO -->
+                <div class="home-3d-hero" id="homeHeroBanner">
+                    <div class="home-hero-mesh"></div>
+                    <div class="home-hero-content">
+                        <span class="home-hero-label"><i class="fas fa-sparkles"></i> Ultimate Experience</span>
+                        <h1 class="home-hero-title" id="greetingText">Good Evening</h1>
+                        <p class="home-hero-sub">Immerse yourself in 3D audio. 100% royalty-free tracks, real-time sync, and offline playback.</p>
+                        <div class="home-hero-actions">
+                            <button class="home-hero-play-btn" onclick="document.getElementById('btnPlayAllOffline').click()"><i class="fas fa-play"></i> Start Listening</button>
+                            <button class="home-hero-chip-btn" onclick="navigateTo('visualizer3d')"><i class="fas fa-cube"></i> 3D Player</button>
+                        </div>
                     </div>
-                    <div class="home-badge-row">
-                        <span class="chip-badge"><i class="fas fa-shield-check"></i> No Copyright Claims</span>
-                        <span class="chip-badge chip-accent"><i class="fas fa-cube"></i> 3D Audio Ready</span>
+                    <div class="home-hero-3d-art">
+                        <!-- Orbit 1 -->
+                        <div class="floating-icon-orbit">
+                            <div class="float-icon float-icon-1"><i class="fas fa-music"></i></div>
+                            <div class="float-icon float-icon-2"><i class="fas fa-compact-disc"></i></div>
+                            <div class="float-icon float-icon-3"><i class="fas fa-headphones"></i></div>
+                            <div class="float-icon float-icon-4"><i class="fas fa-radio"></i></div>
+                        </div>
+                        <!-- Orbit 2 -->
+                        <div class="floating-icon-orbit reverse">
+                            <div class="float-icon reverse float-icon-5"><i class="fas fa-bolt"></i></div>
+                            <div class="float-icon reverse float-icon-6"><i class="fas fa-star"></i></div>
+                        </div>
+                        <!-- Center Sphere -->
+                        <div class="hero-center-sphere" onclick="navigateTo('visualizer3d')">
+                            <i class="fas fa-play"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 3D Stats Row -->
+                <div class="home-stats-bar">
+                    <div class="home-stat-chip">
+                        <div class="home-stat-icon purple"><i class="fas fa-cube"></i></div>
+                        <div class="home-stat-info">
+                            <span class="home-stat-value">3D</span>
+                            <span class="home-stat-label">Audio Ready</span>
+                        </div>
+                    </div>
+                    <div class="home-stat-chip">
+                        <div class="home-stat-icon green"><i class="fas fa-wifi"></i></div>
+                        <div class="home-stat-info">
+                            <span class="home-stat-value">100%</span>
+                            <span class="home-stat-label">Offline Play</span>
+                        </div>
+                    </div>
+                    <div class="home-stat-chip">
+                        <div class="home-stat-icon pink"><i class="fas fa-shield-check"></i></div>
+                        <div class="home-stat-info">
+                            <span class="home-stat-value">Safe</span>
+                            <span class="home-stat-label">Copyright Free</span>
+                        </div>
                     </div>
                 </div>
                 
