@@ -1,0 +1,18 @@
+{
+  "name": "DK Music — Spotify 3D Offline",
+  "short_name": "DK Music",
+  "description": "Ultra-Modern Spotify-grade music streaming with 3D Vinyl, 3D Visualizer, Offline Mode, and 100% Copyright-Free tracks.",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#07070a",
+  "theme_color": "#8b5cf6",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='48' fill='%238b5cf6'/><path d='M30 65 A30 30 0 0 1 70 35 M25 75 A40 40 0 0 1 75 25 M35 55 A20 20 0 0 1 65 45' stroke='white' stroke-width='6' stroke-linecap='round' fill='none'/></svg>",
+      "sizes": "192x192 512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
