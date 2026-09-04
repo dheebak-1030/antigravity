@@ -3282,3 +3282,663 @@ td {
   border-color: #ef4444;
 }
 
+/* ============================================================
+   3D LIVE FRIEND JAM & DUAL DEVICE SYNC STYLES
+   ============================================================ */
+
+/* 1. Topbar Jam Button */
+.btn-jam-sync {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: linear-gradient(135deg, rgba(139, 92, 246, 0.22) 0%, rgba(236, 72, 153, 0.22) 100%);
+  border: 1px solid rgba(168, 85, 247, 0.45);
+  color: #fff;
+  padding: 6px 14px;
+  border-radius: var(--radius-full);
+  font-size: 0.82rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.25s cubic-bezier(0.2, 0.8, 0.2, 1);
+  box-shadow: 0 4px 14px rgba(139, 92, 246, 0.25);
+  font-family: inherit;
+  overflow: hidden;
+  user-select: none;
+  touch-action: manipulation;
+}
+.btn-jam-sync:hover {
+  transform: translateY(-2px) scale(1.02);
+  border-color: rgba(236, 72, 153, 0.8);
+  box-shadow: 0 6px 20px rgba(168, 85, 247, 0.45);
+}
+.btn-jam-sync:active {
+  transform: scale(0.96);
+}
+.btn-jam-sync i {
+  color: #c084fc;
+  font-size: 0.95rem;
+  transition: transform 0.3s ease;
+}
+.btn-jam-sync:hover i {
+  transform: rotate(-15deg) scale(1.15);
+}
+.topbar-jam-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: rgba(34, 197, 94, 0.2);
+  border: 1px solid rgba(34, 197, 94, 0.4);
+  color: #4ade80;
+  padding: 2px 7px;
+  border-radius: var(--radius-full);
+  font-size: 0.72rem;
+  font-weight: 800;
+  margin-left: 2px;
+}
+.topbar-jam-badge.hidden {
+  display: none !important;
+}
+
+/* 2. 3D Live Jam Hero Banner on Home Page */
+.jam-hero-card {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: linear-gradient(135deg, rgba(26, 20, 56, 0.85) 0%, rgba(12, 11, 24, 0.95) 60%, rgba(7, 7, 12, 1) 100%);
+  border: 1px solid rgba(168, 85, 247, 0.3);
+  border-radius: var(--radius-xl);
+  padding: 24px 28px;
+  margin-bottom: 24px;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.6), inset 0 1px 1px rgba(255, 255, 255, 0.15);
+  overflow: hidden;
+  transition: transform 0.35s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.35s ease, border-color 0.35s ease;
+  perspective: 1000px;
+}
+.jam-hero-card:hover {
+  transform: translateY(-3px);
+  border-color: rgba(236, 72, 153, 0.6);
+  box-shadow: 0 16px 40px rgba(139, 92, 246, 0.35), inset 0 1px 1px rgba(255, 255, 255, 0.25);
+}
+.jam-card-mesh-bg {
+  position: absolute;
+  top: -60px;
+  right: -60px;
+  width: 320px;
+  height: 320px;
+  background: radial-gradient(circle, rgba(168, 85, 247, 0.28) 0%, rgba(236, 72, 153, 0.12) 50%, transparent 75%);
+  filter: blur(50px);
+  pointer-events: none;
+  z-index: 0;
+}
+.jam-card-content {
+  position: relative;
+  z-index: 1;
+  flex: 1;
+  max-width: 620px;
+}
+.jam-badge-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+  flex-wrap: wrap;
+}
+.jam-pill-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: linear-gradient(90deg, #8b5cf6 0%, #ec4899 100%);
+  color: #fff;
+  font-size: 0.72rem;
+  font-weight: 800;
+  padding: 3px 9px;
+  border-radius: var(--radius-full);
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+  box-shadow: 0 2px 8px rgba(139, 92, 246, 0.4);
+}
+.jam-net-badge {
+  font-size: 0.74rem;
+  color: var(--text-secondary);
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+.jam-card-title {
+  font-size: 1.55rem;
+  font-weight: 800;
+  color: #fff;
+  letter-spacing: -0.5px;
+  margin-bottom: 6px;
+  background: linear-gradient(135deg, #ffffff 30%, #e2e8f0 70%, #c084fc 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+.jam-card-sub {
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  line-height: 1.45;
+  margin-bottom: 18px;
+}
+.jam-card-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.jam-start-btn {
+  padding: 10px 22px;
+  font-size: 0.88rem;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  box-shadow: 0 6px 18px rgba(139, 92, 246, 0.45);
+}
+.jam-join-btn {
+  padding: 10px 20px;
+  font-size: 0.88rem;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  border-color: rgba(255, 255, 255, 0.25);
+  background: rgba(255, 255, 255, 0.04);
+}
+.jam-join-btn:hover {
+  border-color: #fff;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+/* 3D Visual Art inside Hero Card */
+.jam-card-3d-art {
+  position: relative;
+  width: 140px;
+  height: 140px;
+  margin-left: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  perspective: 800px;
+  flex-shrink: 0;
+}
+.jam-3d-rings {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transform-style: preserve-3d;
+}
+.jam-3d-rings .ring {
+  position: absolute;
+  border-radius: 50%;
+  border: 2px dashed rgba(168, 85, 247, 0.4);
+}
+.ring-1 {
+  width: 130px;
+  height: 130px;
+  animation: ringRotate3D 14s linear infinite;
+  border-color: rgba(139, 92, 246, 0.35);
+}
+.ring-2 {
+  width: 100px;
+  height: 100px;
+  animation: ringRotate3D 8s linear infinite reverse;
+  border-color: rgba(236, 72, 153, 0.5);
+  border-style: solid;
+}
+.ring-3 {
+  width: 70px;
+  height: 70px;
+  animation: ringRotate3D 5s linear infinite;
+  border-color: rgba(34, 197, 94, 0.6);
+}
+.jam-sphere {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #a855f7 0%, #ec4899 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.3rem;
+  color: #fff;
+  box-shadow: 0 0 25px rgba(236, 72, 153, 0.8), 0 0 50px rgba(168, 85, 247, 0.4);
+  animation: sphereFloat3D 3s ease-in-out infinite alternate;
+  z-index: 2;
+}
+@keyframes ringRotate3D {
+  0% { transform: rotateX(60deg) rotateZ(0deg); }
+  100% { transform: rotateX(60deg) rotateZ(360deg); }
+}
+@keyframes sphereFloat3D {
+  0% { transform: translateY(-4px) scale(0.96); }
+  100% { transform: translateY(4px) scale(1.04); }
+}
+
+/* 3. 3D Jam Interactive Modal */
+.jam-modal-card {
+  position: relative;
+  max-width: 490px !important;
+  width: 92% !important;
+  background: linear-gradient(180deg, #18152c 0%, #0d0a18 50%, #060609 100%) !important;
+  border: 1px solid rgba(168, 85, 247, 0.4) !important;
+  border-radius: var(--radius-xl) !important;
+  padding: 24px !important;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.8), 0 0 40px rgba(139, 92, 246, 0.25) !important;
+  overflow: hidden;
+  perspective: 1200px;
+}
+.jam-modal-glow {
+  position: absolute;
+  top: -40px;
+  left: 20%;
+  width: 260px;
+  height: 260px;
+  background: radial-gradient(circle, rgba(168, 85, 247, 0.25) 0%, rgba(236, 72, 153, 0.1) 60%, transparent 80%);
+  filter: blur(40px);
+  pointer-events: none;
+  z-index: 0;
+}
+.jam-modal-header {
+  position: relative;
+  z-index: 1;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+  padding-bottom: 16px !important;
+  margin-bottom: 16px !important;
+}
+.jam-title-wrap {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.jam-icon-3d {
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #8b5cf6 0%, #ec4899 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+  color: #fff;
+  box-shadow: 0 4px 16px rgba(168, 85, 247, 0.5);
+}
+.jam-title-wrap h3 {
+  font-size: 1.12rem;
+  font-weight: 800;
+  color: #fff;
+  margin-bottom: 2px;
+}
+.jam-status-indicator {
+  font-size: 0.72rem;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 2px 8px;
+  border-radius: var(--radius-full);
+}
+.jam-status-indicator.online {
+  background: rgba(34, 197, 94, 0.15);
+  color: #4ade80;
+  border: 1px solid rgba(34, 197, 94, 0.35);
+}
+.jam-status-indicator.offline {
+  background: rgba(245, 158, 11, 0.15);
+  color: #fbbf24;
+  border: 1px solid rgba(245, 158, 11, 0.35);
+}
+.jam-status-indicator.standby {
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--text-secondary);
+}
+.pulse-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #a855f7;
+  display: inline-block;
+  animation: pulseDotAnim 1.8s infinite;
+}
+.pulse-dot.green {
+  background: #22c55e;
+  box-shadow: 0 0 8px #22c55e;
+}
+.pulse-dot.orange {
+  background: #f59e0b;
+  box-shadow: 0 0 8px #f59e0b;
+}
+@keyframes pulseDotAnim {
+  0% { transform: scale(0.9); opacity: 0.7; }
+  50% { transform: scale(1.25); opacity: 1; }
+  100% { transform: scale(0.9); opacity: 0.7; }
+}
+
+/* Jam Tab Switcher */
+.jam-tab-bar {
+  display: flex;
+  background: rgba(0, 0, 0, 0.4);
+  border-radius: var(--radius-full);
+  padding: 4px;
+  gap: 4px;
+  margin-bottom: 20px;
+  position: relative;
+  z-index: 1;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+.jam-tab-btn {
+  flex: 1;
+  background: transparent;
+  border: none;
+  color: var(--text-secondary);
+  font-size: 0.82rem;
+  font-weight: 700;
+  padding: 8px 12px;
+  border-radius: var(--radius-full);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: all 0.2s ease;
+  font-family: inherit;
+}
+.jam-tab-btn.active {
+  background: linear-gradient(135deg, rgba(139, 92, 246, 0.4) 0%, rgba(236, 72, 153, 0.4) 100%);
+  color: #fff;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.4);
+}
+
+.jam-modal-body {
+  position: relative;
+  z-index: 1;
+}
+
+/* Host Showcase Card */
+.jam-code-showcase {
+  text-align: center;
+  background: rgba(22, 20, 38, 0.6);
+  border: 1px solid rgba(168, 85, 247, 0.35);
+  border-radius: var(--radius-lg);
+  padding: 20px 16px;
+  margin-bottom: 16px;
+  box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.4);
+}
+.jam-code-label {
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.8px;
+  color: var(--text-muted);
+  display: block;
+  margin-bottom: 10px;
+}
+.jam-code-3d-box {
+  background: rgba(8, 8, 14, 0.9);
+  border: 2px solid rgba(168, 85, 247, 0.6);
+  border-radius: var(--radius-md);
+  padding: 10px 20px;
+  display: inline-block;
+  margin-bottom: 14px;
+  box-shadow: 0 0 20px rgba(168, 85, 247, 0.35);
+  letter-spacing: 4px;
+}
+.jam-code-digits {
+  font-family: monospace;
+  font-size: 2rem;
+  font-weight: 900;
+  color: #fff;
+  background: linear-gradient(135deg, #ffffff 0%, #c084fc 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+.jam-code-actions {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+}
+.jam-action-btn {
+  font-size: 0.78rem;
+  padding: 7px 14px;
+  border-radius: var(--radius-full);
+}
+
+/* Radar Ping Scanner */
+.jam-radar-box {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 24px 0 10px 0;
+}
+.jam-radar-box .radar-center {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: #a855f7;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+  box-shadow: 0 0 16px rgba(168, 85, 247, 0.8);
+  position: relative;
+  z-index: 2;
+}
+.jam-radar-box .radar-circle {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  border: 1px solid rgba(168, 85, 247, 0.4);
+}
+.circle-1 {
+  width: 70px;
+  height: 70px;
+  animation: radarPulse 2.4s infinite;
+}
+.circle-2 {
+  width: 105px;
+  height: 105px;
+  animation: radarPulse 2.4s 0.8s infinite;
+}
+.circle-3 {
+  width: 140px;
+  height: 140px;
+  animation: radarPulse 2.4s 1.6s infinite;
+}
+@keyframes radarPulse {
+  0% { transform: translate(-50%, -50%) scale(0.5); opacity: 0.9; }
+  100% { transform: translate(-50%, -50%) scale(1.35); opacity: 0; }
+}
+.jam-radar-box p {
+  margin-top: 30px;
+  font-size: 0.78rem;
+  color: var(--text-secondary);
+  text-align: center;
+  font-weight: 600;
+  position: relative;
+  z-index: 2;
+}
+
+/* Join View */
+.jam-join-box {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 10px 0;
+}
+.jam-input-label {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+.jam-input-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+.jam-input-wrap .input-icon {
+  position: absolute;
+  left: 14px;
+  color: var(--accent-light);
+  font-size: 0.95rem;
+}
+.jam-code-input {
+  width: 100%;
+  padding: 12px 14px 12px 42px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(168, 85, 247, 0.4);
+  border-radius: var(--radius-md);
+  color: #fff;
+  font-size: 1.1rem;
+  font-weight: 800;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  font-family: monospace;
+  transition: all 0.2s ease;
+}
+.jam-code-input:focus {
+  outline: none;
+  border-color: #ec4899;
+  box-shadow: 0 0 16px rgba(236, 72, 153, 0.4);
+  background: rgba(255, 255, 255, 0.1);
+}
+.jam-help-text {
+  font-size: 0.76rem;
+  color: var(--text-muted);
+  line-height: 1.35;
+}
+.jam-connect-btn {
+  padding: 12px;
+  font-size: 0.92rem;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 6px;
+  box-shadow: 0 6px 20px rgba(139, 92, 246, 0.4);
+}
+
+/* Active Session Card */
+.jam-active-dashboard {
+  margin-top: 14px;
+}
+.jam-active-divider {
+  height: 1px;
+  background: rgba(255, 255, 255, 0.08);
+  margin-bottom: 14px;
+}
+.jam-active-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+.jam-active-tag {
+  font-size: 0.74rem;
+  font-weight: 800;
+  color: #4ade80;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+.jam-sync-toggle-wrap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.76rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+.jam-syncing-song-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 10px 12px;
+  border-radius: var(--radius-md);
+  margin-bottom: 14px;
+}
+.jam-sync-cover {
+  width: 44px;
+  height: 44px;
+  border-radius: 6px;
+  object-fit: cover;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+}
+.jam-sync-info {
+  flex: 1;
+  min-width: 0;
+}
+.jam-sync-info h4 {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #fff;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-bottom: 2px;
+}
+.jam-sync-info p {
+  font-size: 0.74rem;
+  color: var(--text-secondary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.jam-bottom-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* Responsive Mobile Adjustments for 3D Jam */
+@media (max-width: 768px) {
+  .jam-hero-card {
+    flex-direction: column-reverse;
+    align-items: flex-start;
+    padding: 18px 16px;
+    gap: 16px;
+  }
+  .jam-card-3d-art {
+    margin-left: 0;
+    align-self: center;
+    width: 110px;
+    height: 110px;
+  }
+  .jam-card-title {
+    font-size: 1.25rem;
+  }
+  .jam-card-sub {
+    font-size: 0.8rem;
+    margin-bottom: 14px;
+  }
+  .jam-card-actions {
+    width: 100%;
+  }
+  .jam-start-btn, .jam-join-btn {
+    flex: 1;
+    justify-content: center;
+    padding: 9px 12px;
+    font-size: 0.8rem;
+  }
+  .btn-jam-sync span:not(.topbar-jam-badge) {
+    display: none;
+  }
+  .btn-jam-sync {
+    padding: 6px 10px;
+  }
+}
+
+

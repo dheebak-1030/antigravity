@@ -121,6 +121,17 @@
                         <span class="network-text" id="networkText">Online</span>
                     </div>
 
+                    <!-- 3D Friend Connect / Jam Button -->
+                    <button class="btn-jam-sync" id="btnOpenJamModal" title="Friend Connect: Listen Together in Realtime">
+                        <div class="jam-btn-glow"></div>
+                        <i class="fas fa-tower-broadcast"></i>
+                        <span>Friend Jam</span>
+                        <span class="topbar-jam-badge hidden" id="topbarJamBadge">
+                            <span class="pulse-dot"></span>
+                            <strong id="topbarRoomCode">DK-0000</strong>
+                        </span>
+                    </button>
+
                     <!-- Quick Local Import Button -->
                     <button class="btn-outline import-top-btn" id="btnImportLocalTop" title="Import audio files from your device">
                         <i class="fas fa-file-arrow-up"></i>
@@ -145,6 +156,35 @@
                     </div>
                 </div>
                 
+                <!-- 3D LIVE FRIEND JAM / 2-DEVICE SYNC HERO BANNER -->
+                <div class="jam-hero-card" id="jamHeroBanner">
+                    <div class="jam-card-mesh-bg"></div>
+                    <div class="jam-card-3d-art">
+                        <div class="jam-3d-rings">
+                            <div class="ring ring-1"></div>
+                            <div class="ring ring-2"></div>
+                            <div class="ring ring-3"></div>
+                            <div class="jam-sphere"><i class="fas fa-headphones-simple"></i></div>
+                        </div>
+                    </div>
+                    <div class="jam-card-content">
+                        <div class="jam-badge-row">
+                            <span class="jam-pill-badge"><i class="fas fa-tower-broadcast"></i> LIVE DUAL SYNC</span>
+                            <span class="jam-net-badge" id="jamNetBadge"><i class="fas fa-wifi"></i> Online &amp; Offline Ready</span>
+                        </div>
+                        <h2 class="jam-card-title">Connect 2 Devices with Code</h2>
+                        <p class="jam-card-sub">Listen to music together with a friend in real-time! Sync play, pause &amp; tracks across devices with a 6-digit room code. Works both online &amp; offline.</p>
+                        <div class="jam-card-actions">
+                            <button class="btn-primary jam-start-btn" id="btnHeroHostRoom">
+                                <i class="fas fa-plus-circle"></i> Create Jam Room
+                            </button>
+                            <button class="btn-outline jam-join-btn" id="btnHeroJoinRoom">
+                                <i class="fas fa-key"></i> Enter Room Code
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
                 <div class="quick-picks" id="quickPicks"></div>
 
                 <!-- Curated Copyright-Free Playlists Shelf -->
@@ -480,6 +520,113 @@
         </div>
     </div>
 
+    <!-- 3D LIVE FRIEND JAM / DUAL DEVICE SYNC MODAL -->
+    <div class="modal-backdrop hidden" id="jamModal">
+        <div class="modal-card jam-modal-card">
+            <!-- 3D Modal Glow & Header -->
+            <div class="jam-modal-glow"></div>
+            <div class="modal-header jam-modal-header">
+                <div class="jam-title-wrap">
+                    <div class="jam-icon-3d"><i class="fas fa-tower-broadcast"></i></div>
+                    <div>
+                        <h3>Friend Jam &bull; Dual Sync</h3>
+                        <div class="jam-status-indicator standby" id="jamStatusPill">
+                            <span class="pulse-dot"></span> Ready to Connect
+                        </div>
+                    </div>
+                </div>
+                <button class="btn-icon-sm" id="btnCloseJamModal"><i class="fas fa-xmark"></i></button>
+            </div>
+
+            <!-- Tab Switcher (Host vs Join) -->
+            <div class="jam-tab-bar">
+                <button class="jam-tab-btn active" id="tabJamHost"><i class="fas fa-plus-circle"></i> Host Session</button>
+                <button class="jam-tab-btn" id="tabJamJoin"><i class="fas fa-key"></i> Join with Code</button>
+            </div>
+
+            <div class="modal-body jam-modal-body">
+                <!-- 1. HOST VIEW: Room Code Display & Share -->
+                <div class="jam-view-pane" id="jamHostView">
+                    <div class="jam-code-showcase">
+                        <span class="jam-code-label">SHARE THIS ROOM CODE WITH YOUR FRIEND</span>
+                        <div class="jam-code-3d-box">
+                            <span class="jam-code-digits" id="displayJamRoomCode">DK-----</span>
+                        </div>
+                        <div class="jam-code-actions">
+                            <button class="btn-outline jam-action-btn" id="btnCopyJamCode">
+                                <i class="far fa-copy"></i> Copy Code
+                            </button>
+                            <button class="btn-outline jam-action-btn" id="btnCopyJamLink">
+                                <i class="fas fa-link"></i> Copy Invite Link
+                            </button>
+                            <button class="btn-icon-sm" id="btnRegenerateCode" title="Generate New Code">
+                                <i class="fas fa-arrows-rotate"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="jam-radar-box">
+                        <div class="radar-circle circle-1"></div>
+                        <div class="radar-circle circle-2"></div>
+                        <div class="radar-circle circle-3"></div>
+                        <div class="radar-center"><i class="fas fa-satellite-dish"></i></div>
+                        <p id="jamPeerStatusText"><i class="fas fa-satellite-dish"></i> Room Code Ready &bull; Waiting for friend...</p>
+                    </div>
+                </div>
+
+                <!-- 2. JOIN VIEW: Code Input & Connect -->
+                <div class="jam-view-pane" id="jamJoinView" style="display: none;">
+                    <div class="jam-join-box">
+                        <label for="inputJoinJamCode" class="jam-input-label">Enter 6-Digit Room Code</label>
+                        <div class="jam-input-wrap">
+                            <i class="fas fa-key input-icon"></i>
+                            <input type="text" id="inputJoinJamCode" class="jam-code-input" placeholder="e.g. DK-8492" maxlength="10">
+                        </div>
+                        <p class="jam-help-text">Ask your friend for their Jam Room Code to sync playback instantly.</p>
+                        <button class="btn-primary jam-connect-btn" id="btnConnectJamRoom">
+                            <i class="fas fa-link"></i> Connect &amp; Sync Playback
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 3. ACTIVE SESSION DASHBOARD (Visible when connected) -->
+                <div class="jam-active-dashboard" id="jamActiveSessionView" style="display: none;">
+                    <div class="jam-active-divider"></div>
+                    <div class="jam-active-header">
+                        <span class="jam-active-tag"><i class="fas fa-bolt"></i> Realtime Synchronized</span>
+                        <div class="jam-sync-toggle-wrap">
+                            <span>Live Sync</span>
+                            <label class="toggle-switch">
+                                <input type="checkbox" id="jamSyncToggle" checked>
+                                <span class="slider round"></span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="jam-syncing-song-card">
+                        <img src="" alt="" class="jam-sync-cover" id="jamActiveCover" style="display: none;">
+                        <div class="jam-sync-info">
+                            <h4 id="jamActiveSongTitle">No track currently syncing</h4>
+                            <p id="jamActiveSongArtist">Play any track to sync with your friend</p>
+                        </div>
+                        <button class="btn-outline btn-small" id="btnJamDownloadOffline" title="Download for 100% Offline Play">
+                            <i class="fas fa-cloud-arrow-down"></i> Save Offline
+                        </button>
+                    </div>
+
+                    <div class="jam-bottom-actions">
+                        <a href="#" class="btn-text-sm" onclick="navigateTo('offline'); document.getElementById('jamModal').classList.add('hidden'); return false;">
+                            <i class="fas fa-folder-open"></i> View Offline Vault
+                        </a>
+                        <button class="btn-danger btn-small" id="btnDisconnectJam">
+                            <i class="fas fa-arrow-right-from-bracket"></i> Leave Room
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- QUEUE DRAWER (Spotify Feature) -->
     <div class="drawer-overlay hidden" id="queueDrawer">
         <div class="drawer-card" id="queueDrawerCard">
@@ -576,10 +723,11 @@
                 <button class="btn-icon ctrl-btn" id="btnMpsRepeat"><i class="fas fa-repeat"></i></button>
             </div>
 
-            <!-- Mobile Bottom Tools (Lyrics, Offline, 3D) -->
+            <!-- Mobile Bottom Tools (Lyrics, Offline, 3D, Jam) -->
             <div class="mps-tools-row">
                 <button class="mps-tool-btn" id="btnMpsLyrics"><i class="fas fa-microphone"></i> <span>Lyrics</span></button>
                 <button class="mps-tool-btn" id="btnMpsDownload"><i class="fas fa-download"></i> <span>Offline</span></button>
+                <button class="mps-tool-btn" id="btnMpsJam"><i class="fas fa-tower-broadcast"></i> <span>Jam</span></button>
                 <button class="mps-tool-btn" id="btnMps3D"><i class="fas fa-record-vinyl"></i> <span>3D Deck</span></button>
             </div>
         </div>
@@ -691,6 +839,7 @@
     <script src="music-data.js"></script>
     <script src="offline-db.js"></script>
     <script src="audio-visualizer-3d.js"></script>
+    <script src="jam-sync.js"></script>
     <script src="app.js"></script>
 </body>
 </html>
