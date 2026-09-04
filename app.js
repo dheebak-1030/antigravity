@@ -310,6 +310,10 @@ function navigateTo(section, pushHistory = true) {
   } else if (section === 'visualizer3d') {
     update3DViewInfo();
     window.DK_3DAudio?.resizeCanvas();
+  } else if (section === 'tamil-music') {
+    renderTamilSection();
+  } else if (section === 'ai-assistant') {
+    initAIAssistantSection();
   } else if (section === 'home') {
     renderAll();
   }
@@ -723,6 +727,13 @@ function renderSongGrid(list, containerId = 'songGrid') {
         <div class="song-info">
           <h3 title="${esc(song.title)}">${esc(song.title)}</h3>
           <p>${esc(song.artist)}</p>
+          ${(song.movie || song.year || song.mood) ? `
+            <div class="song-card-metadata-row">
+              ${song.movie ? `<span class="meta-tag-pill movie"><i class="fas fa-film"></i> ${esc(song.movie)}</span>` : ''}
+              ${song.year ? `<span class="meta-tag-pill year">${esc(song.year)}</span>` : ''}
+              ${song.mood ? `<span class="meta-tag-pill mood">${esc(song.mood)}</span>` : ''}
+            </div>
+          ` : ''}
         </div>
       </div>`;
   }).join('');
@@ -1906,24 +1917,29 @@ function update3DViewInfo() {
 
 // ── Search & Filter Engine ──────────────────────────────────
 function renderSearchSection() {
-  const query = searchInput ? searchInput.value.toLowerCase().trim() : '';
+  const query = searchInput ? searchInput.value.trim() : '';
   let filtered = songs;
 
   // Filter by category tag
   if (currentSearchGenre === 'local') {
     filtered = filtered.filter(s => s.isLocal);
   } else if (currentSearchGenre !== 'all') {
-    filtered = filtered.filter(s => (s.genre || '').toLowerCase() === currentSearchGenre.toLowerCase());
+    filtered = filtered.filter(s => (s.genre || '').toLowerCase().includes(currentSearchGenre.toLowerCase()) || (s.search_tags || []).includes(currentSearchGenre.toLowerCase()));
   }
 
-  // Filter by text query
+  // Filter by text query using Tamil AI Engine
   if (query) {
-    filtered = filtered.filter(s =>
-      s.title.toLowerCase().includes(query) ||
-      s.artist.toLowerCase().includes(query) ||
-      (s.album && s.album.toLowerCase().includes(query)) ||
-      (s.genre && s.genre.toLowerCase().includes(query))
-    );
+    if (window.DK_TamilAIEngine) {
+      filtered = window.DK_TamilAIEngine.searchTamilSongs(filtered, query);
+    } else {
+      const q = query.toLowerCase();
+      filtered = filtered.filter(s =>
+        s.title.toLowerCase().includes(q) ||
+        s.artist.toLowerCase().includes(q) ||
+        (s.album && s.album.toLowerCase().includes(q)) ||
+        (s.genre && s.genre.toLowerCase().includes(q))
+      );
+    }
   }
 
   renderSongGrid(filtered, 'searchGrid');
@@ -2559,6 +2575,266 @@ document.getElementById('btnModalCreatePl')?.addEventListener('click', () => {
   closeAddToPlaylistModal();
   activePlaylistId = null;
   navigateTo('create');
+});
+
+// ── TAMIL DISCOVERY & AI ASSISTANT MODULE ─────────────────
+let activeTamilFilter = 'all';
+
+function renderTamilSection(filterMode = activeTamilFilter, query = '') {
+  activeTamilFilter = filterMode;
+  const grid = document.getElementById('tamilGrid');
+  const countBadge = document.getElementById('tamilTotalCount');
+  if (!grid) return;
+
+  const searchVal = query || document.getElementById('tamilSearchInput')?.value || '';
+  let list = songs;
+
+  // 1. Multi-language fuzzy search matcher
+  if (window.DK_TamilAIEngine) {
+    list = window.DK_TamilAIEngine.searchTamilSongs(songs, searchVal);
+  }
+
+  // 2. Mood / Category Chip Filter
+  if (filterMode !== 'all') {
+    if (filterMode === '90s') {
+      list = list.filter(s => s.year >= 1990 && s.year <= 1999);
+    } else if (filterMode === 'Ilaiyaraaja') {
+      list = list.filter(s => (s.artist || '').toLowerCase().includes('ilaiyaraaja') || (s.search_tags || []).includes('ilaiyaraaja'));
+    } else if (filterMode === 'AR Rahman') {
+      list = list.filter(s => (s.artist || '').toLowerCase().includes('rahman') || (s.search_tags || []).includes('ar rahman'));
+    } else {
+      list = list.filter(s => s.mood === filterMode || s.genre === filterMode || (s.search_tags || []).includes(filterMode.toLowerCase()));
+    }
+  }
+
+  if (countBadge) countBadge.textContent = list.length;
+
+  if (!list.length) {
+    grid.innerHTML = `
+      <div class="empty-state">
+        <i class="fas fa-om" style="font-size:2.2rem;margin-bottom:12px;opacity:0.5;color:#f59e0b;"></i>
+        <p>No Tamil tracks matching "${esc(searchVal || filterMode)}"</p>
+        <span style="font-size:0.8rem;">Try searching in Tamil (தமிழ்), Tanglish (e.g. 'Kannana Kanne') or English</span>
+      </div>`;
+    return;
+  }
+
+  renderSongGrid(list, 'tamilGrid');
+}
+
+function initTamilListeners() {
+  const searchInput = document.getElementById('tamilSearchInput');
+  const aiFilterBtn = document.getElementById('btnTamilAISearch');
+  const moodChips = document.querySelectorAll('#tamilMoodChips .genre-chip');
+
+  searchInput?.addEventListener('input', e => {
+    renderTamilSection(activeTamilFilter, e.target.value);
+  });
+
+  aiFilterBtn?.addEventListener('click', () => {
+    const searchVal = searchInput?.value || 'melody';
+    const recs = window.DK_TamilAIEngine ? window.DK_TamilAIEngine.searchTamilSongs(songs, searchVal) : songs;
+    if (recs.length) {
+      openAIRecommendModal(recs[0]);
+    } else {
+      showToast('🤖 AI Tamil Engine: Searching catalog...');
+    }
+  });
+
+  moodChips.forEach(chip => {
+    chip.addEventListener('click', () => {
+      moodChips.forEach(c => c.classList.remove('active'));
+      chip.classList.add('active');
+      const filter = chip.dataset.tamilFilter;
+      renderTamilSection(filter, searchInput?.value || '');
+    });
+  });
+}
+
+// ── AI Assistant Chat Controller ────────────────────────────
+let aiChatInitialized = false;
+
+function initAIAssistantSection() {
+  const chatWindow = document.getElementById('aiChatWindow');
+  const chatInput = document.getElementById('aiChatInput');
+  const sendBtn = document.getElementById('btnSendAIChat');
+  const resetBtn = document.getElementById('btnClearAIChat');
+  const promptChips = document.querySelectorAll('.ai-prompt-chip');
+
+  if (!aiChatInitialized) {
+    aiChatInitialized = true;
+
+    promptChips.forEach(chip => {
+      chip.addEventListener('click', () => {
+        const prompt = chip.dataset.prompt;
+        if (chatInput) chatInput.value = prompt;
+        handleSendAIChat(prompt);
+      });
+    });
+
+    sendBtn?.addEventListener('click', () => handleSendAIChat());
+
+    chatInput?.addEventListener('keydown', e => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        handleSendAIChat();
+      }
+    });
+
+    resetBtn?.addEventListener('click', () => {
+      if (!chatWindow) return;
+      chatWindow.innerHTML = `
+        <div class="ai-message ai-message-bot">
+          <div class="ai-msg-avatar"><i class="fas fa-robot"></i></div>
+          <div class="ai-msg-content">
+            <p><strong>Vanakkam! (வணக்கம்!)</strong> I am your DK Tamil AI Music Assistant. 🎵</p>
+            <p>Ask me for music recommendations using any language — Tamil script, Tanglish, or English. Click prompt chips above or type below!</p>
+          </div>
+        </div>`;
+      showToast('Chat history reset');
+    });
+  }
+}
+
+async function handleSendAIChat(customPrompt = null) {
+  const chatInput = document.getElementById('aiChatInput');
+  const chatWindow = document.getElementById('aiChatWindow');
+  if (!chatWindow) return;
+
+  const prompt = (customPrompt || chatInput?.value || '').trim();
+  if (!prompt) return;
+
+  if (chatInput) chatInput.value = '';
+
+  // 1. Append User Message
+  const userMsgHTML = `
+    <div class="ai-message ai-message-user">
+      <div class="ai-msg-avatar"><i class="fas fa-user"></i></div>
+      <div class="ai-msg-content">
+        <p>${esc(prompt)}</p>
+      </div>
+    </div>`;
+  chatWindow.insertAdjacentHTML('beforeend', userMsgHTML);
+
+  // 2. Append Typing Indicator Loading State
+  const typingHTML = `
+    <div class="ai-message ai-message-bot" id="aiTypingMsg">
+      <div class="ai-msg-avatar"><i class="fas fa-robot"></i></div>
+      <div class="ai-msg-content">
+        <div class="ai-typing-dots"><span></span><span></span><span></span></div>
+      </div>
+    </div>`;
+  chatWindow.insertAdjacentHTML('beforeend', typingHTML);
+  chatWindow.scrollTop = chatWindow.scrollHeight;
+
+  // 3. Process AI Query via Tamil AI Engine (Proxy or Local NLP)
+  try {
+    let result = null;
+    if (window.DK_TamilAIEngine) {
+      result = await window.DK_TamilAIEngine.processAIChatQuery(prompt, songs);
+    }
+
+    // Remove typing indicator
+    const typingEl = document.getElementById('aiTypingMsg');
+    if (typingEl) typingEl.remove();
+
+    if (!result) {
+      result = {
+        text: "I searched our Tamil catalog for your request.",
+        matchedSongs: songs.slice(0, 4)
+      };
+    }
+
+    // 4. Format In-Chat Playable Mini Song Cards
+    let songCardsHTML = '';
+    if (result.matchedSongs && result.matchedSongs.length) {
+      songCardsHTML = `
+        <div class="ai-chat-song-list">
+          ${result.matchedSongs.map(song => `
+            <div class="ai-song-card-mini" data-song-id="${esc(song.id)}">
+              <img src="${esc(song.cover_url || '')}" alt="${esc(song.title)}" class="ai-mini-cover" onerror="this.style.display='none'">
+              <div class="ai-mini-info">
+                <div class="ai-mini-title">${esc(song.title)}</div>
+                <div class="ai-mini-artist">${esc(song.artist)} ${song.movie ? `&bull; ${esc(song.movie)}` : ''}</div>
+              </div>
+              <div class="ai-mini-actions">
+                <button class="btn-play-mini" data-song-id="${esc(song.id)}" style="background:#8b5cf6;color:#fff;border:none;width:32px;height:32px;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;">
+                  <i class="fas fa-play" style="font-size:0.75rem;"></i>
+                </button>
+              </div>
+            </div>
+          `).join('')}
+        </div>`;
+    }
+
+    const botMsgHTML = `
+      <div class="ai-message ai-message-bot">
+        <div class="ai-msg-avatar"><i class="fas fa-robot"></i></div>
+        <div class="ai-msg-content">
+          <p>${esc(result.text).replace(/\n/g, '<br>')}</p>
+          ${result.explanation ? `<p style="font-size:0.78rem;color:var(--text-sub);margin-top:6px;"><i class="fas fa-sparkles"></i> ${esc(result.explanation)}</p>` : ''}
+          ${songCardsHTML}
+        </div>
+      </div>`;
+
+    chatWindow.insertAdjacentHTML('beforeend', botMsgHTML);
+    chatWindow.scrollTop = chatWindow.scrollHeight;
+
+    // Bind click handlers on in-chat mini song play buttons
+    chatWindow.querySelectorAll('.ai-song-card-mini').forEach(card => {
+      const songId = card.dataset.songId;
+      card.addEventListener('click', e => {
+        const songIdx = songs.findIndex(s => s.id === songId);
+        if (songIdx >= 0) {
+          currentQueue = [...songs];
+          playSong(songIdx);
+          showToast(`♪ Playing "${songs[songIdx].title}"`);
+        }
+      });
+    });
+
+  } catch (err) {
+    const typingEl = document.getElementById('aiTypingMsg');
+    if (typingEl) typingEl.remove();
+
+    const errHTML = `
+      <div class="ai-message ai-message-bot">
+        <div class="ai-msg-avatar"><i class="fas fa-exclamation-triangle" style="color:#ef4444;"></i></div>
+        <div class="ai-msg-content" style="border-color:#ef4444;">
+          <p>Sorry, I encountered an issue processing your request. Please try again or rephrase your prompt.</p>
+        </div>
+      </div>`;
+    chatWindow.insertAdjacentHTML('beforeend', errHTML);
+    chatWindow.scrollTop = chatWindow.scrollHeight;
+  }
+}
+
+// ── AI Recommendation Modal Handler ─────────────────────────
+function openAIRecommendModal(targetSong) {
+  const modal = document.getElementById('aiRecommendModal');
+  const listEl = document.getElementById('aiRecommendList');
+  const subEl  = document.getElementById('aiRecommendTargetSub');
+  const closeBtn = document.getElementById('btnCloseAIModal');
+
+  if (!modal || !listEl) return;
+
+  if (subEl && targetSong) {
+    subEl.textContent = `Recommended similar to "${targetSong.title}" (${targetSong.artist})`;
+  }
+
+  const recs = window.DK_TamilAIEngine ? window.DK_TamilAIEngine.getAIRecommendations(songs, targetSong) : [];
+  const recSongs = recs.map(r => r.song || r);
+
+  renderTrackRows(recSongs, listEl, { showAlbum: true });
+  modal.classList.remove('hidden');
+
+  closeBtn?.onclick = () => modal.classList.add('hidden');
+  modal.onclick = e => { if (e.target === modal) modal.classList.add('hidden'); };
+}
+
+// Boot listeners
+window.addEventListener('DOMContentLoaded', () => {
+  initTamilListeners();
 });
 btnAddNowPlayingToPl?.addEventListener('click', () => {
   const currentSong = currentQueue[currentSongIndex];

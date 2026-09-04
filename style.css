@@ -4379,4 +4379,415 @@ td {
   }
 }
 
+/* ── TAMIL MUSIC DISCOVERY & AI ASSISTANT STYLES ───────────────── */
+
+/* Badges */
+.badge-tm {
+  background: linear-gradient(135deg, #f59e0b, #ef4444);
+  color: #fff;
+  font-weight: 800;
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+.badge-ai {
+  background: linear-gradient(135deg, #8b5cf6, #ec4899);
+  color: #fff;
+  font-weight: 800;
+  padding: 2px 6px;
+  border-radius: 4px;
+  animation: aiGlowPulse 2.5s ease-in-out infinite;
+}
+@keyframes aiGlowPulse {
+  0%, 100% { box-shadow: 0 0 4px rgba(236, 72, 153, 0.4); }
+  50% { box-shadow: 0 0 12px rgba(236, 72, 153, 0.9); }
+}
+
+/* Tamil Hero Banner */
+.tamil-hero {
+  background: linear-gradient(135deg, #2e1065 0%, #1e1b4b 50%, #0f172a 100%);
+  border: 1px solid rgba(245, 158, 11, 0.25);
+  box-shadow: 0 16px 40px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.1);
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  padding: 28px 32px;
+  border-radius: var(--radius-xl);
+  margin-bottom: 24px;
+}
+.tamil-hero-icon {
+  background: linear-gradient(135deg, #f59e0b, #d97706);
+  color: #fff;
+  width: 64px;
+  height: 64px;
+  font-size: 2rem;
+  border-radius: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 8px 24px rgba(245, 158, 11, 0.4);
+}
+.tamil-quick-stats {
+  display: flex;
+  gap: 10px;
+  margin-top: 12px;
+  flex-wrap: wrap;
+}
+
+/* Tamil Controls & Search */
+.tamil-controls-area {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin-bottom: 24px;
+}
+.tamil-search-bar-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: var(--radius-lg);
+  padding: 6px 6px 6px 16px;
+  transition: all 0.3s ease;
+}
+.tamil-search-bar-wrap:focus-within {
+  border-color: #f59e0b;
+  box-shadow: 0 0 16px rgba(245, 158, 11, 0.25);
+  background: rgba(255, 255, 255, 0.08);
+}
+.tamil-search-input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  color: #fff;
+  font-size: 0.95rem;
+  outline: none;
+  font-family: inherit;
+}
+.tamil-search-input::placeholder {
+  color: var(--text-sub);
+}
+.tamil-ai-search-btn {
+  background: linear-gradient(135deg, #f59e0b, #ef4444);
+  color: #fff;
+  border: none;
+  padding: 10px 18px;
+  border-radius: var(--radius-md);
+  font-weight: 700;
+  font-size: 0.85rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.2s ease;
+}
+.tamil-ai-search-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 14px rgba(245, 158, 11, 0.4);
+}
+.tamil-mood-chips-row {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding-bottom: 6px;
+  scrollbar-width: thin;
+}
+
+/* Song card metadata tags */
+.song-card-metadata-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 6px;
+  flex-wrap: wrap;
+}
+.meta-tag-pill {
+  font-size: 0.68rem;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--text-secondary);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+.meta-tag-pill.movie {
+  color: #c4b5fd;
+  background: rgba(139, 92, 246, 0.15);
+  border-color: rgba(139, 92, 246, 0.3);
+}
+.meta-tag-pill.year {
+  color: #fde047;
+  background: rgba(245, 158, 11, 0.15);
+  border-color: rgba(245, 158, 11, 0.3);
+}
+.meta-tag-pill.mood {
+  color: #f472b6;
+  background: rgba(236, 72, 153, 0.15);
+  border-color: rgba(236, 72, 153, 0.3);
+}
+
+/* AI Assistant Chat Section */
+.ai-assistant-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+.ai-header-left {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+.ai-avatar-glow {
+  width: 52px;
+  height: 52px;
+  border-radius: 16px;
+  background: linear-gradient(135deg, #8b5cf6, #ec4899);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-size: 1.6rem;
+  box-shadow: 0 0 20px rgba(139, 92, 246, 0.5);
+  animation: aiPulse 3s ease-in-out infinite;
+}
+@keyframes aiPulse {
+  0%, 100% { transform: scale(1); box-shadow: 0 0 20px rgba(139, 92, 246, 0.5); }
+  50% { transform: scale(1.05); box-shadow: 0 0 30px rgba(236, 72, 153, 0.8); }
+}
+.ai-sub-badge {
+  font-size: 0.75rem;
+  background: rgba(139, 92, 246, 0.2);
+  color: #c4b5fd;
+  padding: 3px 8px;
+  border-radius: var(--radius-full);
+  margin-left: 8px;
+  font-weight: 700;
+  vertical-align: middle;
+}
+.ai-header-sub {
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+  margin-top: 2px;
+}
+
+.ai-suggestions-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  overflow-x: auto;
+  margin-bottom: 18px;
+  padding-bottom: 6px;
+  scrollbar-width: thin;
+}
+.ai-prompt-label {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+.ai-prompt-chip {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: var(--text-primary);
+  font-size: 0.82rem;
+  padding: 6px 12px;
+  border-radius: var(--radius-full);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.2s ease;
+}
+.ai-prompt-chip:hover {
+  background: rgba(139, 92, 246, 0.2);
+  border-color: #8b5cf6;
+  transform: translateY(-1px);
+}
+
+.ai-chat-window {
+  background: rgba(13, 11, 26, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: var(--radius-xl);
+  padding: 20px;
+  min-height: 380px;
+  max-height: 520px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-bottom: 16px;
+  box-shadow: inset 0 2px 10px rgba(0,0,0,0.5);
+}
+.ai-message {
+  display: flex;
+  gap: 12px;
+  max-width: 85%;
+  animation: msgFadeIn 0.3s ease;
+}
+@keyframes msgFadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.ai-message-bot {
+  align-self: flex-start;
+}
+.ai-message-user {
+  align-self: flex-end;
+  flex-direction: row-reverse;
+}
+.ai-msg-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  background: linear-gradient(135deg, #8b5cf6, #ec4899);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+  flex-shrink: 0;
+}
+.ai-message-user .ai-msg-avatar {
+  background: linear-gradient(135deg, #3b82f6, #06b6d4);
+}
+.ai-msg-content {
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 14px 16px;
+  border-radius: 16px;
+  color: var(--text-primary);
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+.ai-message-bot .ai-msg-content {
+  border-top-left-radius: 4px;
+}
+.ai-message-user .ai-msg-content {
+  background: rgba(139, 92, 246, 0.25);
+  border-color: rgba(139, 92, 246, 0.4);
+  border-top-right-radius: 4px;
+}
+.ai-msg-content p {
+  margin-bottom: 8px;
+}
+.ai-msg-content p:last-child {
+  margin-bottom: 0;
+}
+
+/* In-Chat Playable Mini Song Cards */
+.ai-chat-song-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 12px;
+}
+.ai-song-card-mini {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: rgba(0, 0, 0, 0.35);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 8px 12px;
+  border-radius: var(--radius-md);
+  transition: all 0.2s ease;
+}
+.ai-song-card-mini:hover {
+  background: rgba(139, 92, 246, 0.15);
+  border-color: rgba(139, 92, 246, 0.4);
+}
+.ai-mini-cover {
+  width: 40px;
+  height: 40px;
+  border-radius: 6px;
+  object-fit: cover;
+}
+.ai-mini-info {
+  flex: 1;
+  min-width: 0;
+}
+.ai-mini-title {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #fff;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.ai-mini-artist {
+  font-size: 0.72rem;
+  color: var(--text-secondary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.ai-mini-actions {
+  display: flex;
+  gap: 6px;
+}
+
+.ai-chat-input-bar {
+  display: flex;
+  gap: 10px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: var(--radius-lg);
+  padding: 6px 6px 6px 16px;
+}
+.ai-chat-input-bar:focus-within {
+  border-color: #8b5cf6;
+  box-shadow: 0 0 16px rgba(139, 92, 246, 0.25);
+}
+.ai-chat-input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  color: #fff;
+  font-size: 0.95rem;
+  outline: none;
+  font-family: inherit;
+}
+.ai-send-btn {
+  background: linear-gradient(135deg, #8b5cf6, #ec4899);
+  color: #fff;
+  border: none;
+  padding: 10px 20px;
+  border-radius: var(--radius-md);
+  font-weight: 700;
+  font-size: 0.85rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.2s ease;
+}
+.ai-send-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 14px rgba(236, 72, 153, 0.4);
+}
+
+.ai-typing-dots {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 0;
+}
+.ai-typing-dots span {
+  width: 6px;
+  height: 6px;
+  background: #c4b5fd;
+  border-radius: 50%;
+  animation: typingDot 1.4s infinite ease-in-out both;
+}
+.ai-typing-dots span:nth-child(1) { animation-delay: 0s; }
+.ai-typing-dots span:nth-child(2) { animation-delay: 0.2s; }
+.ai-typing-dots span:nth-child(3) { animation-delay: 0.4s; }
+@keyframes typingDot {
+  0%, 80%, 100% { transform: scale(0); }
+  40% { transform: scale(1); }
+}
+
+.ai-recommend-modal-card {
+  max-width: 580px;
+}
+
 

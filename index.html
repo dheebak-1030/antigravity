@@ -38,6 +38,24 @@
                         </a>
                     </li>
                     <li>
+                        <a href="#" class="nav-item" data-section="tamil-music">
+                            <i class="fas fa-om nav-icon"></i>
+                            <div class="nav-label-badge-wrap">
+                                <span>Tamil Music</span>
+                                <span class="badge-mini badge-tm">தமிழ்</span>
+                            </div>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" class="nav-item" data-section="ai-assistant">
+                            <i class="fas fa-robot nav-icon"></i>
+                            <div class="nav-label-badge-wrap">
+                                <span>AI Assistant</span>
+                                <span class="badge-mini badge-ai">AI</span>
+                            </div>
+                        </a>
+                    </li>
+                    <li>
                         <a href="#" class="nav-item" data-section="offline">
                             <i class="fas fa-cloud-arrow-down nav-icon"></i>
                             <div class="nav-label-badge-wrap">
@@ -289,6 +307,89 @@
                         <p>Search by title, artist, genre, or album</p>
                         <span>All music is safe to play without copyright concerns</span>
                     </div>
+                </div>
+            </section>
+
+            <!-- 2B. CLEAN TAMIL MUSIC DISCOVERY SECTION -->
+            <section class="content-section" id="section-tamil-music">
+                <div class="hero-banner tamil-hero">
+                    <div class="hero-icon tamil-hero-icon"><i class="fas fa-om"></i></div>
+                    <div class="hero-info">
+                        <span class="hero-label"><i class="fas fa-sparkles"></i> தமிழ் இசை வளம்</span>
+                        <h1 class="hero-title">Tamil Music Discovery</h1>
+                        <p class="hero-sub">AI-Powered search in Tamil (தமிழ்), Tanglish &amp; English. 100% Legal &amp; Royalty Free.</p>
+                        <div class="tamil-quick-stats">
+                            <span class="liked-stat-chip"><i class="fas fa-music"></i> <span id="tamilTotalCount">12</span> Tracks</span>
+                            <span class="liked-stat-chip"><i class="fas fa-language"></i> Tamil + Tanglish</span>
+                            <span class="liked-stat-chip"><i class="fas fa-robot"></i> AI Recommended</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tamil Search Bar & Mood Chips -->
+                <div class="tamil-controls-area">
+                    <div class="tamil-search-bar-wrap">
+                        <i class="fas fa-magnifying-glass search-icon"></i>
+                        <input type="text" id="tamilSearchInput" class="tamil-search-input" placeholder="Search Tamil songs in தமிழ், Tanglish (e.g. 'Kannana Kanne', '90s', 'ARR', 'Sad')...">
+                        <button class="tamil-ai-search-btn" id="btnTamilAISearch"><i class="fas fa-wand-magic-sparkles"></i> AI Filter</button>
+                    </div>
+
+                    <div class="tamil-mood-chips-row" id="tamilMoodChips">
+                        <button class="genre-chip active" data-tamil-filter="all">All Tamil</button>
+                        <button class="genre-chip" data-tamil-filter="Melody">🎵 Melody</button>
+                        <button class="genre-chip" data-tamil-filter="Romantic">❤️ Romantic</button>
+                        <button class="genre-chip" data-tamil-filter="Sad">😢 Sad (சோகம்)</button>
+                        <button class="genre-chip" data-tamil-filter="90s">🎷 90s Classics</button>
+                        <button class="genre-chip" data-tamil-filter="Ilaiyaraaja">🎼 Ilaiyaraaja</button>
+                        <button class="genre-chip" data-tamil-filter="AR Rahman">🎹 AR Rahman</button>
+                        <button class="genre-chip" data-tamil-filter="Energetic">⚡ Folk &amp; Kuthu</button>
+                    </div>
+                </div>
+
+                <div class="section-header">
+                    <h2 class="section-title"><i class="fas fa-record-vinyl header-icon"></i> Featured Tamil Songs</h2>
+                </div>
+                <div class="song-grid" id="tamilGrid"></div>
+            </section>
+
+            <!-- 2C. CHAT-STYLE AI MUSIC ASSISTANT SECTION -->
+            <section class="content-section" id="section-ai-assistant">
+                <div class="ai-assistant-header">
+                    <div class="ai-header-left">
+                        <div class="ai-avatar-glow"><i class="fas fa-robot"></i></div>
+                        <div>
+                            <h1 class="section-page-title">AI Music Assistant <span class="ai-sub-badge">இசை AI 🤖</span></h1>
+                            <p class="ai-header-sub">Ask for song recommendations in Tamil, Tanglish, or English!</p>
+                        </div>
+                    </div>
+                    <button class="btn-outline btn-small" id="btnClearAIChat"><i class="fas fa-rotate-left"></i> Reset Chat</button>
+                </div>
+
+                <!-- Example Prompt Chips -->
+                <div class="ai-suggestions-row">
+                    <span class="ai-prompt-label">Try asking:</span>
+                    <button class="ai-prompt-chip" data-prompt="Suggest Tamil melody songs">💡 "Suggest Tamil melody songs"</button>
+                    <button class="ai-prompt-chip" data-prompt="90s Tamil songs">📻 "90s Tamil songs"</button>
+                    <button class="ai-prompt-chip" data-prompt="Ilaiyaraaja songs">🎼 "Ilaiyaraaja songs"</button>
+                    <button class="ai-prompt-chip" data-prompt="Sad Tamil songs">💔 "Sad Tamil songs"</button>
+                    <button class="ai-prompt-chip" data-prompt="AR Rahman romantic songs">💕 "AR Rahman romantic songs"</button>
+                </div>
+
+                <!-- Chat Messages Container -->
+                <div class="ai-chat-window" id="aiChatWindow">
+                    <div class="ai-message ai-message-bot">
+                        <div class="ai-msg-avatar"><i class="fas fa-robot"></i></div>
+                        <div class="ai-msg-content">
+                            <p><strong>Vanakkam! (வணக்கம்!)</strong> I am your DK Tamil AI Music Assistant. 🎵</p>
+                            <p>Ask me for music recommendations using any language — Tamil script, Tanglish, or English. You can click on any suggested prompt above or type your prompt below!</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Chat Input Row -->
+                <div class="ai-chat-input-bar">
+                    <input type="text" id="aiChatInput" class="ai-chat-input" placeholder="Type your music request (e.g. 'Play 90s AR Rahman melodies')...">
+                    <button class="ai-send-btn" id="btnSendAIChat"><i class="fas fa-paper-plane"></i> Send</button>
                 </div>
             </section>
 
@@ -815,6 +916,14 @@
             <i class="fas fa-magnifying-glass"></i>
             <span>Search</span>
         </button>
+        <button class="mobile-nav-item" data-section="tamil-music">
+            <i class="fas fa-om"></i>
+            <span>Tamil</span>
+        </button>
+        <button class="mobile-nav-item" data-section="ai-assistant">
+            <i class="fas fa-robot"></i>
+            <span>AI Assistant</span>
+        </button>
         <button class="mobile-nav-item" data-section="library">
             <i class="fas fa-layer-group"></i>
             <span>Library</span>
@@ -886,12 +995,32 @@
     <input type="file" id="localAudioFileInput" accept="audio/*,.mp3,.wav,.ogg,.m4a,.flac" multiple style="display:none">
     <div class="toast" id="toast"></div>
 
+    <!-- AI RECOMMENDATION MODAL -->
+    <div class="modal-backdrop hidden" id="aiRecommendModal">
+        <div class="modal-card ai-recommend-modal-card">
+            <div class="modal-header">
+                <div class="jam-title-wrap">
+                    <div class="jam-icon-3d" style="background: linear-gradient(135deg, #8b5cf6, #ec4899);"><i class="fas fa-wand-magic-sparkles"></i></div>
+                    <div>
+                        <h3>AI Recommendations</h3>
+                        <p id="aiRecommendTargetSub" style="color:var(--text-sub); font-size:12px; margin:0;">Based on track analysis</p>
+                    </div>
+                </div>
+                <button class="btn-icon-sm" id="btnCloseAIModal"><i class="fas fa-xmark"></i></button>
+            </div>
+            <div class="modal-body" id="aiRecommendModalBody" style="padding-top:10px;">
+                <div class="track-list" id="aiRecommendList"></div>
+            </div>
+        </div>
+    </div>
+
     <!-- Scripts -->
     <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
     <script src="supabase-client.js"></script>
     <script src="music-data.js"></script>
     <script src="offline-db.js"></script>
     <script src="audio-visualizer-3d.js"></script>
+    <script src="tamil-ai-engine.js"></script>
     <script src="app.js"></script>
     <script src="jam-sync.js"></script>
 </body>
