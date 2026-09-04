@@ -2,22 +2,26 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DK Music — Your Personal Sound</title>
-    <meta name="description" content="DK Music — Stream your favorite songs, albums, and playlists with modern dark UI.">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>DK Music — 3D Spotify & Offline Player</title>
+    <meta name="description" content="DK Music — Spotify-grade music streaming with 3D Vinyl Turntable, 3D Visualizer, Full Offline Mode & 100% Copyright-Free Music.">
+    <meta name="theme-color" content="#07070a">
+    <link rel="manifest" href="manifest.json">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Outfit:wght@400;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <div class="app-layout">
-        <!-- SIDEBAR -->
+        <!-- SIDEBAR (Desktop / Tablet) -->
         <aside class="sidebar" id="sidebar">
             <div class="sidebar-logo">
                 <div class="logo-icon"><i class="fas fa-wave-square"></i></div>
                 <div class="logo-text-wrap">
                     <span class="logo-text">DK MUSIC</span>
-                    <span class="logo-badge">PRO</span>
+                    <span class="logo-badge">3D PRO</span>
                 </div>
             </div>
             
@@ -31,6 +35,24 @@
                     <li>
                         <a href="#" class="nav-item" data-section="search">
                             <i class="fas fa-magnifying-glass nav-icon"></i><span>Search</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" class="nav-item" data-section="offline">
+                            <i class="fas fa-cloud-arrow-down nav-icon"></i>
+                            <div class="nav-label-badge-wrap">
+                                <span>Offline & Local</span>
+                                <span class="badge-mini" id="sidebarOfflineCount">0</span>
+                            </div>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" class="nav-item" data-section="visualizer3d">
+                            <i class="fas fa-record-vinyl nav-icon"></i>
+                            <div class="nav-label-badge-wrap">
+                                <span>3D Turntable</span>
+                                <span class="badge-mini badge-3d">3D</span>
+                            </div>
                         </a>
                     </li>
                 </ul>
@@ -54,49 +76,120 @@
                             <span class="lib-entry-meta">Playlist &bull; <span id="likedCount">0</span> songs</span>
                         </div>
                     </a>
-                    <a href="#" class="lib-entry create-entry" data-section="create">
-                        <div class="lib-icon create-icon"><i class="fas fa-plus"></i></div>
+                    
+                    <a href="#" class="lib-entry import-entry" id="btnSidebarImport">
+                        <div class="lib-icon import-icon"><i class="fas fa-file-audio"></i></div>
                         <div class="lib-entry-info">
-                            <span class="lib-entry-name">Create Playlist</span>
-                            <span class="lib-entry-meta">Custom collection</span>
+                            <span class="lib-entry-name">Import Local MP3</span>
+                            <span class="lib-entry-meta">100% Offline Safe</span>
                         </div>
                     </a>
 
                     <!-- User Created Playlists in Sidebar -->
                     <div class="sidebar-playlists-container" id="sidebarPlaylistsList"></div>
                 </div>
+
+                <!-- Copyright-Free Safety Guarantee Box -->
+                <div class="sidebar-copyright-badge">
+                    <i class="fas fa-shield-halved"></i>
+                    <div>
+                        <strong>100% Copyright Safe</strong>
+                        <p>Royalty-Free &amp; Offline Ready</p>
+                    </div>
+                </div>
             </nav>
         </aside>
 
-        <!-- MAIN CONTENT -->
+        <!-- MAIN CONTENT AREA -->
         <main class="main-content" id="mainContent">
+            <!-- TOPBAR -->
             <header class="topbar">
                 <div class="topbar-nav">
                     <button class="topbar-btn" id="btnBack" title="Back"><i class="fas fa-chevron-left"></i></button>
                     <button class="topbar-btn" id="btnForward" title="Forward"><i class="fas fa-chevron-right"></i></button>
                 </div>
+                
                 <div class="search-wrap" id="searchWrap">
                     <i class="fas fa-magnifying-glass search-icon"></i>
-                    <input type="text" id="searchInput" class="search-input" placeholder="Search songs, artists, albums, or playlists...">
+                    <input type="text" id="searchInput" class="search-input" placeholder="Search songs, artists, albums, or offline tracks...">
                 </div>
+
                 <div class="topbar-right">
-                    <a href="admin.html" class="btn-outline admin-btn"><i class="fas fa-cloud-arrow-up"></i> Admin Upload</a>
-                    <div class="user-avatar" title="Account: DK">DK</div>
+                    <!-- Network Online/Offline Status Indicator -->
+                    <div class="network-badge online" id="networkBadge" title="Network status">
+                        <span class="network-dot"></span>
+                        <span class="network-text" id="networkText">Online</span>
+                    </div>
+
+                    <!-- 3D Friend Connect / Jam Button -->
+                    <button class="btn-jam-sync" id="btnOpenJamModal" title="Friend Connect: Listen Together in Realtime">
+                        <div class="jam-btn-glow"></div>
+                        <i class="fas fa-tower-broadcast"></i>
+                        <span>Friend Jam</span>
+                        <span class="topbar-jam-badge hidden" id="topbarJamBadge">
+                            <span class="pulse-dot"></span>
+                            <strong id="topbarRoomCode">DK-0000</strong>
+                        </span>
+                    </button>
+
+                    <!-- Quick Local Import Button -->
+                    <button class="btn-outline import-top-btn" id="btnImportLocalTop" title="Import audio files from your device">
+                        <i class="fas fa-file-arrow-up"></i>
+                        <span class="desktop-only-text">Import Audio</span>
+                    </button>
+
+                    <a href="admin.html" class="btn-outline admin-btn desktop-only-text"><i class="fas fa-cloud-arrow-up"></i> Admin</a>
+                    <div class="user-avatar" id="userAvatarBtn" title="DK Music Pro Account">DK</div>
                 </div>
             </header>
 
             <!-- 1. HOME SECTION -->
             <section class="content-section active" id="section-home">
                 <div class="greeting-row">
-                    <h1 class="greeting-text" id="greetingText">Good Evening</h1>
-                    <span class="greeting-sub">Stream your sound anytime, anywhere</span>
+                    <div>
+                        <h1 class="greeting-text" id="greetingText">Good Evening</h1>
+                        <span class="greeting-sub">Spotify vibes &bull; 100% Copyright-Free &bull; Works Offline</span>
+                    </div>
+                    <div class="home-badge-row">
+                        <span class="chip-badge"><i class="fas fa-shield-check"></i> No Copyright Claims</span>
+                        <span class="chip-badge chip-accent"><i class="fas fa-cube"></i> 3D Audio Ready</span>
+                    </div>
                 </div>
                 
+                <!-- 3D LIVE FRIEND JAM / 2-DEVICE SYNC HERO BANNER -->
+                <div class="jam-hero-card" id="jamHeroBanner">
+                    <div class="jam-card-mesh-bg"></div>
+                    <div class="jam-card-3d-art">
+                        <div class="jam-3d-rings">
+                            <div class="ring ring-1"></div>
+                            <div class="ring ring-2"></div>
+                            <div class="ring ring-3"></div>
+                            <div class="jam-sphere"><i class="fas fa-headphones-simple"></i></div>
+                        </div>
+                    </div>
+                    <div class="jam-card-content">
+                        <div class="jam-badge-row">
+                            <span class="jam-pill-badge"><i class="fas fa-tower-broadcast"></i> LIVE DUAL SYNC</span>
+                            <span class="jam-net-badge" id="jamNetBadge"><i class="fas fa-wifi"></i> Online &amp; Offline Ready</span>
+                        </div>
+                        <h2 class="jam-card-title">Connect 2 Devices with Code</h2>
+                        <p class="jam-card-sub">Listen to music together with a friend in real-time! Sync play, pause &amp; tracks across devices with a 6-digit room code. Works both online &amp; offline.</p>
+                        <div class="jam-card-actions">
+                            <button class="btn-primary jam-start-btn" id="btnHeroHostRoom">
+                                <i class="fas fa-plus-circle"></i> Create Jam Room
+                            </button>
+                            <button class="btn-outline jam-join-btn" id="btnHeroJoinRoom">
+                                <i class="fas fa-key"></i> Enter Room Code
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
                 <div class="quick-picks" id="quickPicks"></div>
 
-                <!-- Your Playlists Shelf -->
+                <!-- Curated Copyright-Free Playlists Shelf -->
                 <div class="section-header" id="homePlaylistsHeader">
-                    <h2 class="section-title"><i class="fas fa-compact-disc header-icon"></i> Your Playlists</h2>
+                    <h2 class="section-title"><i class="fas fa-compact-disc header-icon"></i> Featured Playlists</h2>
                     <a href="#" class="see-all" id="seeAllPlaylists">See all</a>
                 </div>
                 <div class="scroll-row" id="homePlaylistsRow"></div>
@@ -108,32 +201,161 @@
                 </div>
                 <div class="scroll-row" id="recentRow"></div>
 
-                <!-- Albums -->
+                <!-- Featured Albums -->
                 <div class="section-header">
                     <h2 class="section-title"><i class="fas fa-record-vinyl header-icon"></i> Featured Albums</h2>
                     <a href="#" class="see-all" id="seeAllAlbums">See all</a>
                 </div>
                 <div class="scroll-row" id="albumsRow"></div>
 
-                <!-- All Songs -->
+                <!-- All Copyright-Free Tracks -->
                 <div class="section-header">
-                    <h2 class="section-title"><i class="fas fa-music header-icon"></i> All Tracks</h2>
+                    <h2 class="section-title"><i class="fas fa-music header-icon"></i> All Tracks (100% Royalty Free)</h2>
                 </div>
                 <div class="song-grid" id="songGrid"></div>
             </section>
 
             <!-- 2. SEARCH SECTION -->
             <section class="content-section" id="section-search">
-                <h1 class="section-page-title">Search Music</h1>
+                <div class="search-header-area">
+                    <h1 class="section-page-title">Search &amp; Explore</h1>
+                    <!-- Genre & Category Chips -->
+                    <div class="genre-chips-row" id="searchGenreChips">
+                        <button class="genre-chip active" data-genre="all">All</button>
+                        <button class="genre-chip" data-genre="Tamil Fusion">Tamil Fusion</button>
+                        <button class="genre-chip" data-genre="Lo-Fi">Lo-Fi Study</button>
+                        <button class="genre-chip" data-genre="Synthwave">Synthwave</button>
+                        <button class="genre-chip" data-genre="Ambient">Ambient Focus</button>
+                        <button class="genre-chip" data-genre="Phonk">Phonk Drift</button>
+                        <button class="genre-chip" data-genre="local">Local Files</button>
+                    </div>
+                </div>
                 <div class="song-grid" id="searchGrid">
                     <div class="empty-state">
                         <i class="fas fa-magnifying-glass"></i>
-                        <p>Start typing above to search songs, albums, and artists</p>
+                        <p>Search by title, artist, genre, or album</p>
+                        <span>All music is safe to play without copyright concerns</span>
                     </div>
                 </div>
             </section>
 
-            <!-- 3. LIKED SONGS SECTION -->
+            <!-- 3. OFFLINE & LOCAL MUSIC SECTION (NEW) -->
+            <section class="content-section" id="section-offline">
+                <div class="hero-banner offline-hero">
+                    <div class="hero-icon offline-hero-icon"><i class="fas fa-cloud-arrow-down"></i></div>
+                    <div class="hero-info">
+                        <span class="hero-label"><i class="fas fa-signal-stream"></i> Pure Offline Engine</span>
+                        <h1 class="hero-title">Offline &amp; Local Audio</h1>
+                        <p class="hero-sub" id="offlineHeroSub">0 tracks available without internet</p>
+                        <div class="offline-stats-row">
+                            <span class="liked-stat-chip" id="offlineCountBadge"><i class="fas fa-check-circle"></i> 0 Downloaded</span>
+                            <span class="liked-stat-chip" id="localCountBadge"><i class="fas fa-hard-drive"></i> 0 Local MP3s</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="offline-actions-bar">
+                    <button class="btn-play-big" id="btnPlayAllOffline" title="Play All Offline Tracks"><i class="fas fa-play"></i></button>
+                    <button class="btn-secondary-action" id="btnImportLocalBanner">
+                        <i class="fas fa-plus"></i> Import Local MP3s
+                    </button>
+                    <button class="btn-secondary-action" id="btnClearOfflineCache" title="Clear downloaded cache">
+                        <i class="fas fa-trash-arrow-up"></i> Clear Cache
+                    </button>
+                </div>
+
+                <div class="section-header" style="margin-top:20px;">
+                    <h2 class="section-title"><i class="fas fa-download header-icon"></i> Downloaded &amp; Local Tracks</h2>
+                </div>
+                <div class="track-list" id="offlineTrackList">
+                    <div class="empty-state">
+                        <i class="fas fa-cloud-arrow-down"></i>
+                        <p>No offline songs downloaded yet</p>
+                        <span>Click the ⬇️ download button on any song to save it for offline listening!</span>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 4. 3D TURNTABLE & AUDIO VISUALIZER SECTION (NEW) -->
+            <section class="content-section" id="section-visualizer3d">
+                <div class="v3d-header">
+                    <div class="v3d-title-wrap">
+                        <h1 class="section-page-title"><i class="fas fa-record-vinyl"></i> 3D Turntable &amp; Visualizer</h1>
+                        <p class="v3d-sub">Interactive 3D Vinyl Player &bull; Real-time Web Audio Reactive Visualizer</p>
+                    </div>
+                    <div class="v3d-controls-row">
+                        <div class="speed-toggle">
+                            <button class="speed-btn active" id="btnRpm33">33 RPM</button>
+                            <button class="speed-btn" id="btnRpm45">45 RPM</button>
+                        </div>
+                        <div class="vis-mode-toggle">
+                            <button class="vis-mode-btn active" data-mode="rings" title="3D Holographic Rings"><i class="fas fa-circle-nodes"></i> Rings</button>
+                            <button class="vis-mode-btn" data-mode="bars" title="3D Mirrored Frequency Bars"><i class="fas fa-chart-simple"></i> Bars</button>
+                            <button class="vis-mode-btn" data-mode="cosmic" title="Cosmic Particle Vortex"><i class="fas fa-meteor"></i> Cosmic</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="v3d-stage-container">
+                    <!-- 3D VINYL TURNTABLE DECK -->
+                    <div class="turntable-deck-3d" id="turntableDeck">
+                        <div class="deck-surface">
+                            <!-- Metallic Rim & Platter -->
+                            <div class="platter-rim">
+                                <div class="platter-surface">
+                                    <!-- 3D Vinyl Disc -->
+                                    <div class="vinyl-record" id="vinylRecord">
+                                        <div class="vinyl-grooves"></div>
+                                        <div class="vinyl-label">
+                                            <img id="vinylCenterLabelImg" src="" alt="Album" class="vinyl-label-img" style="display:none;">
+                                            <div id="vinylCenterPlaceholder" class="vinyl-label-placeholder">
+                                                <i class="fas fa-music"></i>
+                                            </div>
+                                            <div class="vinyl-spindle"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- 3D Turntable Tonearm -->
+                            <div class="tonearm-assembly" id="tonearmAssembly">
+                                <div class="tonearm-base">
+                                    <div class="weight-knob"></div>
+                                </div>
+                                <div class="tonearm-bar">
+                                    <div class="cartridge-head">
+                                        <div class="stylus-needle"></div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Turntable Power Switch / Pitch Slider -->
+                            <div class="deck-controls">
+                                <div class="deck-indicator" id="deckIndicator"></div>
+                                <div class="deck-brand">DK-3000 PRO</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 3D AUDIO REACTIVE CANVAS -->
+                    <div class="visualizer-canvas-card">
+                        <div class="canvas-header">
+                            <span class="canvas-tag"><i class="fas fa-bolt"></i> Real-time Audio Spectrum</span>
+                            <span class="copyright-tag"><i class="fas fa-badge-check"></i> 100% Royalty Free</span>
+                        </div>
+                        <canvas id="visualizer3DCanvas" class="v3d-canvas"></canvas>
+                        <div class="canvas-footer-info">
+                            <div class="canvas-track-info">
+                                <h3 id="v3dTitle">Select a track to start</h3>
+                                <p id="v3dArtist">3D Audio Engine Ready</p>
+                            </div>
+                            <button class="btn-play-big" id="btnV3dPlay" title="Play / Pause"><i class="fas fa-play"></i></button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 5. LIKED SONGS SECTION -->
             <section class="content-section" id="section-liked">
                 <div class="hero-banner liked-hero" id="likedHeroBanner">
                     <div class="hero-icon liked-hero-icon"><i class="fas fa-heart"></i></div>
@@ -174,21 +396,25 @@
                 <div class="track-list" id="likedList"></div>
             </section>
 
-            <!-- 4. YOUR LIBRARY SECTION -->
+            <!-- 6. YOUR LIBRARY SECTION -->
             <section class="content-section" id="section-library">
                 <div class="library-top-bar">
                     <h1 class="section-page-title">Your Library</h1>
-                    <button class="btn-primary" id="btnNewPlaylistLib"><i class="fas fa-plus"></i> New Playlist</button>
+                    <div class="lib-actions-row">
+                        <button class="btn-outline" id="btnImportInLibrary"><i class="fas fa-file-arrow-up"></i> Import Local</button>
+                        <button class="btn-primary" id="btnNewPlaylistLib"><i class="fas fa-plus"></i> New Playlist</button>
+                    </div>
                 </div>
                 <div class="library-filter-row" id="libraryFilterRow">
                     <button class="filter-chip active" data-filter="all">All Items</button>
                     <button class="filter-chip" data-filter="playlists">Playlists</button>
                     <button class="filter-chip" data-filter="albums">Albums</button>
+                    <button class="filter-chip" data-filter="local">Local Tracks</button>
                 </div>
                 <div class="library-grid" id="libraryGrid"></div>
             </section>
 
-            <!-- 5. CREATE / EDIT PLAYLIST SECTION -->
+            <!-- 7. CREATE / EDIT PLAYLIST SECTION -->
             <section class="content-section" id="section-create">
                 <div class="create-header-bar">
                     <h1 class="section-page-title" id="createPageTitle">Create New Playlist</h1>
@@ -228,7 +454,7 @@
                 </div>
             </section>
 
-            <!-- 6. DEDICATED PLAYLIST DETAIL VIEW -->
+            <!-- 8. DEDICATED PLAYLIST DETAIL VIEW -->
             <section class="content-section" id="section-playlist">
                 <div class="hero-banner playlist-hero" id="plHeroBanner">
                     <div class="pl-hero-cover-wrap" id="plHeroCoverWrap">
@@ -248,9 +474,11 @@
                         </div>
                     </div>
                 </div>
+
                 <div class="playlist-action-bar">
                     <button class="btn-play-big" id="btnPlayPlaylist" title="Play Playlist"><i class="fas fa-play"></i></button>
                     <button class="btn-icon shuffle-btn" id="btnShufflePlaylist" title="Shuffle Playlist"><i class="fas fa-shuffle"></i></button>
+                    <button class="btn-secondary-action" id="btnDownloadPlaylist" title="Download all songs in this playlist"><i class="fas fa-download"></i> Download Playlist</button>
                     <button class="btn-secondary-action" id="btnAddSongsToPl"><i class="fas fa-plus"></i> Add Songs</button>
                     <button class="btn-secondary-action" id="btnEditPlaylist"><i class="fas fa-pen"></i> Edit</button>
                     <button class="btn-secondary-action btn-danger-action" id="btnDeletePlaylist" title="Delete Playlist"><i class="fas fa-trash-can"></i> Delete</button>
@@ -258,7 +486,7 @@
                 <div class="track-list" id="plTrackList"></div>
             </section>
 
-            <!-- 7. ALBUM DETAIL VIEW -->
+            <!-- 9. ALBUM DETAIL VIEW -->
             <section class="content-section" id="section-album">
                 <div class="hero-banner album-hero" id="albumHeroBanner">
                     <img src="" alt="Album Cover" class="album-hero-img" id="albumHeroImg">
@@ -292,10 +520,266 @@
         </div>
     </div>
 
-    <!-- BOTTOM NOW PLAYING PLAYER BAR -->
+    <!-- 3D LIVE FRIEND JAM / DUAL DEVICE SYNC MODAL -->
+    <div class="modal-backdrop hidden" id="jamModal">
+        <div class="modal-card jam-modal-card">
+            <!-- 3D Modal Glow & Header -->
+            <div class="jam-modal-glow"></div>
+            <div class="modal-header jam-modal-header">
+                <div class="jam-title-wrap">
+                    <div class="jam-icon-3d"><i class="fas fa-tower-broadcast"></i></div>
+                    <div>
+                        <h3>Friend Jam &bull; Dual Sync</h3>
+                        <div class="jam-status-indicator standby" id="jamStatusPill">
+                            <span class="pulse-dot"></span> Ready to Connect
+                        </div>
+                    </div>
+                </div>
+                <button class="btn-icon-sm" id="btnCloseJamModal"><i class="fas fa-xmark"></i></button>
+            </div>
+
+            <!-- Tab Switcher (Host vs Join) -->
+            <div class="jam-tab-bar">
+                <button class="jam-tab-btn active" id="tabJamHost"><i class="fas fa-plus-circle"></i> Host Session</button>
+                <button class="jam-tab-btn" id="tabJamJoin"><i class="fas fa-key"></i> Join with Code</button>
+            </div>
+
+            <div class="modal-body jam-modal-body">
+                <!-- 1. HOST VIEW: Room Code Display & Share -->
+                <div class="jam-view-pane" id="jamHostView">
+                    <div class="jam-code-showcase">
+                        <span class="jam-code-label">SHARE THIS ROOM CODE WITH YOUR FRIEND</span>
+                        <div class="jam-code-3d-box">
+                            <span class="jam-code-digits" id="displayJamRoomCode">DK-----</span>
+                        </div>
+                        <div class="jam-code-actions">
+                            <button class="btn-outline jam-action-btn" id="btnCopyJamCode">
+                                <i class="far fa-copy"></i> Copy Code
+                            </button>
+                            <button class="btn-outline jam-action-btn" id="btnCopyJamLink">
+                                <i class="fas fa-link"></i> Copy Invite Link
+                            </button>
+                            <button class="btn-icon-sm" id="btnRegenerateCode" title="Generate New Code">
+                                <i class="fas fa-arrows-rotate"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="jam-radar-box">
+                        <div class="radar-circle circle-1"></div>
+                        <div class="radar-circle circle-2"></div>
+                        <div class="radar-circle circle-3"></div>
+                        <div class="radar-center"><i class="fas fa-satellite-dish"></i></div>
+                        <p id="jamPeerStatusText"><i class="fas fa-satellite-dish"></i> Room Code Ready &bull; Waiting for friend...</p>
+                    </div>
+                </div>
+
+                <!-- 2. JOIN VIEW: Code Input & Connect -->
+                <div class="jam-view-pane" id="jamJoinView" style="display: none;">
+                    <div class="jam-join-box">
+                        <label for="inputJoinJamCode" class="jam-input-label">Enter 6-Digit Room Code</label>
+                        <div class="jam-input-wrap">
+                            <i class="fas fa-key input-icon"></i>
+                            <input type="text" id="inputJoinJamCode" class="jam-code-input" placeholder="e.g. DK-8492" maxlength="10">
+                        </div>
+                        <p class="jam-help-text">Ask your friend for their Jam Room Code to sync playback instantly.</p>
+                        <button class="btn-primary jam-connect-btn" id="btnConnectJamRoom">
+                            <i class="fas fa-link"></i> Connect &amp; Sync Playback
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 3. ACTIVE SESSION DASHBOARD (Visible when connected) -->
+                <div class="jam-active-dashboard" id="jamActiveSessionView" style="display: none;">
+                    <div class="jam-active-divider"></div>
+                    <div class="jam-active-header">
+                        <span class="jam-active-tag"><i class="fas fa-bolt"></i> Realtime Synchronized</span>
+                        <div class="jam-sync-toggle-wrap">
+                            <span>Live Sync</span>
+                            <label class="toggle-switch">
+                                <input type="checkbox" id="jamSyncToggle" checked>
+                                <span class="slider round"></span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="jam-syncing-song-card">
+                        <img src="" alt="" class="jam-sync-cover" id="jamActiveCover" style="display: none;">
+                        <div class="jam-sync-info">
+                            <h4 id="jamActiveSongTitle">No track currently syncing</h4>
+                            <p id="jamActiveSongArtist">Play any track to sync with your friend</p>
+                        </div>
+                        <button class="btn-outline btn-small" id="btnJamDownloadOffline" title="Download for 100% Offline Play">
+                            <i class="fas fa-cloud-arrow-down"></i> Save Offline
+                        </button>
+                    </div>
+
+                    <div class="jam-bottom-actions">
+                        <a href="#" class="btn-text-sm" onclick="navigateTo('offline'); document.getElementById('jamModal').classList.add('hidden'); return false;">
+                            <i class="fas fa-folder-open"></i> View Offline Vault
+                        </a>
+                        <button class="btn-danger btn-small" id="btnDisconnectJam">
+                            <i class="fas fa-arrow-right-from-bracket"></i> Leave Room
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- QUEUE DRAWER (Spotify Feature) -->
+    <div class="drawer-overlay hidden" id="queueDrawer">
+        <div class="drawer-card" id="queueDrawerCard">
+            <div class="drawer-handle-bar" id="queueHandleBar"><div class="drawer-pill"></div></div>
+            <div class="drawer-header">
+                <div class="drawer-title-wrap">
+                    <i class="fas fa-list-ol"></i>
+                    <h3>Play Queue</h3>
+                </div>
+                <div class="drawer-actions">
+                    <button class="btn-text-sm" id="btnClearQueue"><i class="fas fa-trash-can"></i> Clear</button>
+                    <button class="btn-icon-sm" id="btnCloseQueue"><i class="fas fa-xmark"></i></button>
+                </div>
+            </div>
+            <div class="drawer-body">
+                <div class="queue-section-label">Now Playing</div>
+                <div class="queue-current-item" id="queueNowPlaying"></div>
+
+                <div class="queue-section-label" style="margin-top:16px;">Next In Queue</div>
+                <div class="queue-list" id="queueList"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- SYNCED LYRICS DRAWER / KARAOKE MODAL (Spotify Feature) -->
+    <div class="drawer-overlay hidden" id="lyricsDrawer">
+        <div class="drawer-card lyrics-card" id="lyricsDrawerCard">
+            <div class="drawer-handle-bar" id="lyricsHandleBar"><div class="drawer-pill"></div></div>
+            <div class="drawer-header">
+                <div class="drawer-title-wrap">
+                    <i class="fas fa-microphone-lines"></i>
+                    <h3>Synced Lyrics (Karaoke)</h3>
+                </div>
+                <button class="btn-icon-sm" id="btnCloseLyrics"><i class="fas fa-xmark"></i></button>
+            </div>
+            <div class="lyrics-container" id="lyricsContainer">
+                <div class="lyrics-empty">Select a track with lyrics to sing along</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MOBILE FULLSCREEN SLIDE-UP NOW PLAYING SHEET -->
+    <div class="mobile-player-sheet" id="mobilePlayerSheet">
+        <div class="mps-handle-bar" id="mpsHandleBar">
+            <div class="mps-pill"></div>
+        </div>
+        
+        <div class="mps-top-nav">
+            <button class="btn-icon" id="btnCloseMobileSheet"><i class="fas fa-chevron-down"></i></button>
+            <div class="mps-header-title">
+                <span>PLAYING FROM PLAYLIST</span>
+                <strong id="mpsPlaylistSource">All Tracks</strong>
+            </div>
+            <button class="btn-icon" id="btnMpsQueue"><i class="fas fa-list"></i></button>
+        </div>
+
+        <div class="mps-content">
+            <!-- Vinyl / Cover View Toggle in Fullscreen with Ambient Glow -->
+            <div class="mps-artwork-container" id="mpsArtworkContainer">
+                <div class="mps-ambient-glow" id="mpsAmbientGlow"></div>
+                <img src="" alt="" id="mpsCoverImg" class="mps-cover-img">
+                <div class="mps-placeholder" id="mpsPlaceholder"><i class="fas fa-music"></i></div>
+            </div>
+
+            <div class="mps-info-row">
+                <div class="mps-texts">
+                    <h2 id="mpsTitle">Nothing playing</h2>
+                    <p id="mpsArtist">&mdash;</p>
+                </div>
+                <button class="btn-icon like-btn" id="btnMpsLike">
+                    <i class="far fa-heart"></i>
+                </button>
+            </div>
+
+            <!-- Mobile Playback Bar with Scrub Tooltip -->
+            <div class="playback-bar mps-playback-bar">
+                <div class="progress-container" id="mpsProgressCont">
+                    <div class="progress-fill" id="mpsProgressBar"></div>
+                    <div class="progress-thumb" id="mpsProgressHandle"></div>
+                    <div class="mps-seek-tooltip" id="mpsSeekTooltip">0:00</div>
+                </div>
+                <div class="mps-times">
+                    <span id="mpsCurrentTime">0:00</span>
+                    <span id="mpsTotalTime">0:00</span>
+                </div>
+            </div>
+
+            <!-- Mobile Controls -->
+            <div class="mps-controls-row">
+                <button class="btn-icon ctrl-btn" id="btnMpsShuffle"><i class="fas fa-shuffle"></i></button>
+                <button class="btn-icon ctrl-btn-big" id="btnMpsPrev"><i class="fas fa-backward-step"></i></button>
+                <button class="btn-play-pause-huge" id="btnMpsPlayPause"><i class="fas fa-play" id="mpsPlayIcon"></i></button>
+                <button class="btn-icon ctrl-btn-big" id="btnMpsNext"><i class="fas fa-forward-step"></i></button>
+                <button class="btn-icon ctrl-btn" id="btnMpsRepeat"><i class="fas fa-repeat"></i></button>
+            </div>
+
+            <!-- Mobile Bottom Tools (Lyrics, Offline, 3D, Jam) -->
+            <div class="mps-tools-row">
+                <button class="mps-tool-btn" id="btnMpsLyrics"><i class="fas fa-microphone"></i> <span>Lyrics</span></button>
+                <button class="mps-tool-btn" id="btnMpsDownload"><i class="fas fa-download"></i> <span>Offline</span></button>
+                <button class="mps-tool-btn" id="btnMpsJam"><i class="fas fa-tower-broadcast"></i> <span>Jam</span></button>
+                <button class="mps-tool-btn" id="btnMps3D"><i class="fas fa-record-vinyl"></i> <span>3D Deck</span></button>
+            </div>
+        </div>
+    </div>
+
+    <!-- DOCKED MOBILE MINI-PLAYER (Floats above mobile bottom nav) -->
+    <div class="mobile-mini-player" id="mobileMiniPlayer">
+        <div class="mmp-progress" id="mmpProgressBar"></div>
+        <div class="mmp-inner">
+            <div class="mmp-left" id="mmpTapArea">
+                <img src="" alt="" id="mmpCover" class="mmp-thumb hidden">
+                <div class="mmp-thumb-placeholder" id="mmpPlaceholder"><i class="fas fa-music"></i></div>
+                <div class="mmp-info">
+                    <span class="mmp-title" id="mmpTitle">Nothing playing</span>
+                    <span class="mmp-artist" id="mmpArtist">&mdash;</span>
+                </div>
+            </div>
+            <div class="mmp-actions">
+                <button class="btn-icon mmp-btn" id="btnMmpLike"><i class="far fa-heart"></i></button>
+                <button class="btn-icon mmp-btn mmp-play-btn" id="btnMmpPlayPause"><i class="fas fa-play" id="mmpPlayIcon"></i></button>
+            </div>
+        </div>
+    </div>
+
+    <!-- SPOTIFY MOBILE BOTTOM NAVIGATION BAR -->
+    <nav class="mobile-bottom-nav" id="mobileNav">
+        <button class="mobile-nav-item active" data-section="home">
+            <i class="fas fa-house"></i>
+            <span>Home</span>
+        </button>
+        <button class="mobile-nav-item" data-section="search">
+            <i class="fas fa-magnifying-glass"></i>
+            <span>Search</span>
+        </button>
+        <button class="mobile-nav-item" data-section="library">
+            <i class="fas fa-layer-group"></i>
+            <span>Library</span>
+        </button>
+        <button class="mobile-nav-item" data-section="offline">
+            <i class="fas fa-cloud-arrow-down"></i>
+            <span>Offline</span>
+        </button>
+        <button class="mobile-nav-item" data-section="visualizer3d">
+            <i class="fas fa-record-vinyl"></i>
+            <span>3D Player</span>
+        </button>
+    </nav>
+
+    <!-- DESKTOP / TABLET NOW PLAYING PLAYER BAR -->
     <footer class="player-bar" id="playerBar">
         <div class="now-playing">
-            <div class="np-cover-wrap">
+            <div class="np-cover-wrap" id="npCoverWrap">
                 <img src="" alt="Cover" id="npCover" class="np-cover hidden">
                 <div class="np-cover-placeholder" id="npCoverPlaceholder"><i class="fas fa-music"></i></div>
             </div>
@@ -305,6 +789,9 @@
             </div>
             <button class="btn-icon like-btn" id="btnLikeNowPlaying" title="Like this song">
                 <i class="far fa-heart"></i>
+            </button>
+            <button class="btn-icon download-btn" id="btnDownloadNowPlaying" title="Download for Offline Play">
+                <i class="fas fa-cloud-arrow-down"></i>
             </button>
             <button class="btn-icon add-pl-np-btn" id="btnAddNowPlayingToPl" title="Add to Playlist">
                 <i class="fas fa-circle-plus"></i>
@@ -330,7 +817,9 @@
         </div>
 
         <div class="player-extras">
-            <button class="btn-icon ctrl-btn" id="btnQueue" title="Queue / Playlist"><i class="fas fa-list"></i></button>
+            <button class="btn-icon ctrl-btn" id="btnToggleLyrics" title="Synced Lyrics"><i class="fas fa-microphone-lines"></i></button>
+            <button class="btn-icon ctrl-btn" id="btnQuick3D" title="3D Turntable"><i class="fas fa-record-vinyl"></i></button>
+            <button class="btn-icon ctrl-btn" id="btnQueue" title="Queue / Playlist"><i class="fas fa-list-ol"></i></button>
             <i class="fas fa-volume-high ctrl-btn btn-icon" id="muteIcon" style="cursor:pointer;" title="Mute/Unmute"></i>
             <div class="volume-container" id="volumeContainer" title="Volume">
                 <div class="volume-fill" id="volumeBar" style="width:80%;"></div>
@@ -339,11 +828,18 @@
         </div>
     </footer>
 
-    <audio id="audioPlayer"></audio>
+    <!-- Hidden audio element & hidden file inputs -->
+    <audio id="audioPlayer" crossorigin="anonymous"></audio>
+    <input type="file" id="localAudioFileInput" accept="audio/*,.mp3,.wav,.ogg,.m4a,.flac" multiple style="display:none">
     <div class="toast" id="toast"></div>
 
+    <!-- Scripts -->
     <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
     <script src="supabase-client.js"></script>
+    <script src="music-data.js"></script>
+    <script src="offline-db.js"></script>
+    <script src="audio-visualizer-3d.js"></script>
     <script src="app.js"></script>
+    <script src="jam-sync.js"></script>
 </body>
 </html>

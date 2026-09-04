@@ -8,6 +8,7 @@ const STATIC_ASSETS = [
   './offline-db.js',
   './music-data.js',
   './audio-visualizer-3d.js',
+  './jam-sync.js',
   './supabase-client.js',
   './manifest.json'
 ];
