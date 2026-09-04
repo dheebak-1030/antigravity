@@ -265,6 +265,7 @@ function updateLikedCount() {
   });
   const statArtist = document.getElementById('likedStatArtist');
   if (statArtist) statArtist.innerHTML = `<i class="fas fa-music"></i> Top Artist: ${esc(topArtist)}`;
+  if (typeof updateHeroStats === 'function') updateHeroStats();
 }
 
 // ── Navigation Engine ───────────────────────────────────────
@@ -434,8 +435,19 @@ function renderAll() {
   renderSongGrid(songs, 'songGrid');
   renderSidebarPlaylists();
   updateLikedCount();
+  updateHeroStats();
   setTimeout(() => window.DK_Init3DTilt?.(), 100);
 }
+
+function updateHeroStats() {
+  const trackEl = document.getElementById('heroStatTracks');
+  const likedEl = document.getElementById('heroStatLiked');
+  const offlineEl = document.getElementById('heroStatOffline');
+  if (trackEl) trackEl.textContent = songs.length || '—';
+  if (likedEl) likedEl.textContent = likedSongs.size;
+  if (offlineEl) offlineEl.textContent = offlineTrackIds.size;
+}
+
 
 // ── Quick Picks ─────────────────────────────────────────────
 function renderQuickPicks() {
