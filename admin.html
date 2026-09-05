@@ -4,81 +4,463 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Dashboard - Music Player</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <title>Admin Dashboard — DK Music Control Panel</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <link rel="stylesheet" href="style.css">
+    <style>
+        body {
+            background-color: #0b0c10;
+            color: #c5c6c7;
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        .admin-page-container {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 24px 20px;
+        }
+
+        .admin-nav-tabs {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 24px;
+            border-bottom: 1px solid #1f2833;
+            padding-bottom: 12px;
+            flex-wrap: wrap;
+        }
+
+        .tab-btn {
+            background: #1f2833;
+            color: #c5c6c7;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .tab-btn.active {
+            background: #45f3ff;
+            color: #0b0c10;
+            box-shadow: 0 0 12px rgba(69, 243, 255, 0.4);
+        }
+
+        .tab-content-panel {
+            display: none;
+        }
+
+        .tab-content-panel.active {
+            display: block;
+        }
+
+        .admin-card {
+            background: #12141d;
+            border: 1px solid #1f2833;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 24px;
+        }
+
+        .admin-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 12px;
+        }
+
+        .admin-table th, .admin-table td {
+            padding: 12px 16px;
+            text-align: left;
+            border-bottom: 1px solid #1f2833;
+        }
+
+        .admin-table th {
+            background: #1f2833;
+            color: #45f3ff;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .badge-status {
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            display: inline-block;
+        }
+
+        .badge-active { background: rgba(70, 211, 105, 0.2); color: #46d369; }
+        .badge-disabled { background: rgba(255, 77, 77, 0.2); color: #ff4d4d; }
+        .badge-role { background: rgba(69, 243, 255, 0.2); color: #45f3ff; }
+
+        .search-admin-input {
+            width: 100%;
+            max-width: 400px;
+            padding: 10px 16px;
+            background: #1a1d28;
+            border: 1px solid #2d3345;
+            border-radius: 8px;
+            color: #fff;
+            font-size: 0.95rem;
+        }
+
+        /* Toast confirmation alert */
+        .admin-toast {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            padding: 14px 24px;
+            border-radius: 8px;
+            color: #fff;
+            font-weight: 600;
+            z-index: 10000;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.6);
+            display: none;
+        }
+        .admin-toast.success { background: #2e7d32; }
+        .admin-toast.error { background: #c62828; }
+
+        /* Login Overlay Gate */
+        .login-gate-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(11, 12, 16, 0.96);
+            backdrop-filter: blur(10px);
+            z-index: 99999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .login-gate-card {
+            background: #12141d;
+            border: 1px solid #45f3ff;
+            border-radius: 16px;
+            padding: 36px;
+            width: 100%;
+            max-width: 400px;
+            box-shadow: 0 0 30px rgba(69, 243, 255, 0.2);
+            text-align: center;
+        }
+
+        .btn-action-sm {
+            padding: 6px 12px;
+            font-size: 0.8rem;
+            border-radius: 6px;
+            cursor: pointer;
+            border: none;
+            margin-right: 4px;
+        }
+        .btn-edit { background: #0288d1; color: #fff; }
+        .btn-disable { background: #ed6c02; color: #fff; }
+        .btn-delete { background: #d32f2f; color: #fff; }
+        .btn-reorder { background: #45f3ff; color: #0b0c10; font-weight: bold; }
+    </style>
 </head>
 
 <body>
-    <div class="admin-container">
-        <div class="admin-header">
-            <h2>Admin Dashboard</h2>
-            <a href="index.html" class="btn-outline"
-                style="text-decoration: none; display: inline-block; padding: 8px 16px; border-radius: 4px;">Back to
-                Player</a>
-        </div>
 
-        <div class="admin-grid">
-            <!-- Add/Edit Form -->
-            <div class="form-card">
-                <h3 id="formTitle" style="margin-bottom: 20px;">Add New Song</h3>
-                <form id="songForm">
-                    <input type="hidden" id="songId">
-
-                    <div class="form-group">
-                        <label for="title">Song Title *</label>
-                        <input type="text" id="title" required>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="artist">Artist *</label>
-                        <input type="text" id="artist" required>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="album">Album</label>
-                        <input type="text" id="album">
-                    </div>
-
-                    <div class="form-group">
-                        <label for="cover_url">Cover Image URL</label>
-                        <input type="url" id="cover_url" placeholder="https://...">
-                    </div>
-
-                    <div class="form-group">
-                        <label for="audio_url">Cloudinary Audio URL *</label>
-                        <input type="url" id="audio_url" required placeholder="https://res.cloudinary.com/...">
-                    </div>
-
-                    <div style="display: flex; gap: 10px;">
-                        <button type="submit" class="btn-primary" id="submitBtn">Add Song</button>
-                        <button type="button" class="btn-outline hidden" id="cancelBtn">Cancel</button>
-                    </div>
-                </form>
-            </div>
-
-            <!-- Song List Table -->
-            <div class="table-container">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Cover</th>
-                            <th>Title</th>
-                            <th>Artist</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody id="adminSongList">
-                        <!-- Populated by JS -->
-                    </tbody>
-                </table>
+    <!-- Admin Login Gate Overlay -->
+    <div id="adminLoginGate" class="login-gate-overlay">
+        <div class="login-gate-card">
+            <div style="font-size: 2.5rem; color: #45f3ff; margin-bottom: 12px;"><i class="fas fa-shield-halved"></i></div>
+            <h2 style="margin-top:0; color:#fff;">Admin Security Auth</h2>
+            <p style="color:#8e95a5; font-size:0.9rem;">Enter the administrative password to access system controls.</p>
+            <form id="adminLoginForm" style="margin-top: 20px;">
+                <input type="password" id="adminGatePassword" placeholder="Enter Admin Password" class="search-admin-input" style="max-width:100%; margin-bottom:16px;" required>
+                <button type="submit" class="btn-primary" style="width:100%; padding:12px;">Authorize Admin Access</button>
+            </form>
+            <div id="adminGateError" style="color:#ff4d4d; margin-top:12px; font-weight:600; display:none;"></div>
+            <div style="margin-top: 20px;">
+                <a href="index.html" style="color: #45f3ff; text-decoration:none; font-size:0.85rem;"><i class="fas fa-arrow-left"></i> Return to Music Player</a>
             </div>
         </div>
     </div>
 
-    <!-- Supabase JS Client -->
-    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
-    <script src="supabase-client.js"></script>
+    <!-- Main Admin Dashboard UI -->
+    <div class="admin-page-container">
+        <!-- Header -->
+        <div class="admin-header" style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 24px; border-bottom: 1px solid #1f2833; padding-bottom: 16px;">
+            <div>
+                <h1 style="margin:0; color:#fff; display:flex; align-items:center; gap:12px; font-size:1.8rem;">
+                    <i class="fas fa-sliders" style="color:#45f3ff;"></i> DK Music Admin Dashboard
+                </h1>
+                <span style="font-size:0.85rem; color:#8e95a5;">Secure Management • Users • Playlists • Songs • Offline Catalog</span>
+            </div>
+            <div style="display:flex; gap:12px; align-items:center;">
+                <input type="text" id="adminGlobalSearch" class="search-admin-input" placeholder="Search users, playlists, songs...">
+                <button id="btnAdminLogout" class="btn-outline" style="padding: 8px 16px;"><i class="fas fa-right-from-bracket"></i> Logout</button>
+                <a href="index.html" class="btn-primary" style="text-decoration:none; display:inline-flex; align-items:center; gap:8px; padding: 8px 16px;">
+                    <i class="fas fa-music"></i> Open Player
+                </a>
+            </div>
+        </div>
+
+        <!-- Navigation Tabs -->
+        <div class="admin-nav-tabs">
+            <button class="tab-btn active" data-tab="users"><i class="fas fa-users"></i> Users Management</button>
+            <button class="tab-btn" data-tab="playlists"><i class="fas fa-list-check"></i> Playlists Management</button>
+            <button class="tab-btn" data-tab="songs"><i class="fas fa-compact-disc"></i> Songs Catalog</button>
+            <button class="tab-btn" data-tab="offline"><i class="fas fa-download"></i> Offline Download Metadata</button>
+        </div>
+
+        <!-- TAB 1: USERS MANAGEMENT -->
+        <div id="tab-users" class="tab-content-panel active">
+            <div class="admin-card">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+                    <h3 style="margin:0; color:#fff;"><i class="fas fa-user-gear"></i> User Accounts (<span id="userCount">0</span>)</h3>
+                    <button id="btnOpenAddUser" class="btn-primary" style="padding: 6px 14px; font-size:0.85rem;"><i class="fas fa-plus"></i> Create New User</button>
+                </div>
+
+                <!-- Add / Edit User Form Modal/Box -->
+                <div id="userFormCard" class="admin-card" style="display:none; background:#181b26; border-color:#45f3ff;">
+                    <h4 id="userFormTitle" style="margin-top:0; color:#45f3ff;">Create New User</h4>
+                    <form id="userAdminForm">
+                        <input type="hidden" id="userEditId">
+                        <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap:12px; margin-bottom:12px;">
+                            <div>
+                                <label style="font-size:0.8rem; display:block; margin-bottom:4px;">User ID *</label>
+                                <input type="text" id="userFormUserId" class="search-admin-input" style="max-width:100%;" required>
+                            </div>
+                            <div>
+                                <label style="font-size:0.8rem; display:block; margin-bottom:4px;">Display Name</label>
+                                <input type="text" id="userFormName" class="search-admin-input" style="max-width:100%;">
+                            </div>
+                            <div>
+                                <label style="font-size:0.8rem; display:block; margin-bottom:4px;">Password</label>
+                                <input type="password" id="userFormPassword" class="search-admin-input" style="max-width:100%;" placeholder="Leave blank to keep unchanged">
+                            </div>
+                            <div>
+                                <label style="font-size:0.8rem; display:block; margin-bottom:4px;">Role</label>
+                                <select id="userFormRole" class="search-admin-input" style="max-width:100%;">
+                                    <option value="user">User</option>
+                                    <option value="admin">Admin</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label style="font-size:0.8rem; display:block; margin-bottom:4px;">Status</label>
+                                <select id="userFormStatus" class="search-admin-input" style="max-width:100%;">
+                                    <option value="active">Active</option>
+                                    <option value="disabled">Disabled</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div style="display:flex; gap:10px;">
+                            <button type="submit" id="btnSaveUser" class="btn-primary">Save User</button>
+                            <button type="button" id="btnCancelUser" class="btn-outline">Cancel</button>
+                        </div>
+                    </form>
+                </div>
+
+                <div style="overflow-x:auto;">
+                    <table class="admin-table">
+                        <thead>
+                            <tr>
+                                <th>User ID</th>
+                                <th>Name</th>
+                                <th>Role</th>
+                                <th>Status</th>
+                                <th>Created</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="userTableBody">
+                            <!-- JS Populated -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 2: PLAYLISTS MANAGEMENT -->
+        <div id="tab-playlists" class="tab-content-panel">
+            <div class="admin-card">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+                    <h3 style="margin:0; color:#fff;"><i class="fas fa-list"></i> System & User Playlists</h3>
+                    <button id="btnOpenAddPlaylist" class="btn-primary" style="padding: 6px 14px; font-size:0.85rem;"><i class="fas fa-plus"></i> Create Playlist</button>
+                </div>
+
+                <!-- Playlist Form Card -->
+                <div id="playlistFormCard" class="admin-card" style="display:none; background:#181b26; border-color:#45f3ff;">
+                    <h4 id="playlistFormTitle" style="margin-top:0; color:#45f3ff;">Create New Playlist</h4>
+                    <form id="playlistAdminForm">
+                        <input type="hidden" id="playlistEditId">
+                        <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap:12px; margin-bottom:12px;">
+                            <div>
+                                <label style="font-size:0.8rem; display:block; margin-bottom:4px;">Playlist Name *</label>
+                                <input type="text" id="plFormName" class="search-admin-input" style="max-width:100%;" required>
+                            </div>
+                            <div>
+                                <label style="font-size:0.8rem; display:block; margin-bottom:4px;">Description</label>
+                                <input type="text" id="plFormDesc" class="search-admin-input" style="max-width:100%;">
+                            </div>
+                            <div>
+                                <label style="font-size:0.8rem; display:block; margin-bottom:4px;">Cover Artwork URL</label>
+                                <input type="url" id="plFormCover" class="search-admin-input" style="max-width:100%;" placeholder="https://...">
+                            </div>
+                        </div>
+                        <div style="display:flex; gap:10px;">
+                            <button type="submit" class="btn-primary">Save Playlist</button>
+                            <button type="button" id="btnCancelPlaylist" class="btn-outline">Cancel</button>
+                        </div>
+                    </form>
+                </div>
+
+                <div style="overflow-x:auto;">
+                    <table class="admin-table">
+                        <thead>
+                            <tr>
+                                <th>Cover</th>
+                                <th>Playlist Name</th>
+                                <th>Description</th>
+                                <th>Songs Count</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="playlistTableBody">
+                            <!-- JS Populated -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Track Reordering & Playlist Tracks Editor Modal/Card -->
+            <div id="playlistTracksEditor" class="admin-card" style="display:none; border-color:#45f3ff;">
+                <div style="display:flex; justify-content:space-between; align-items:center;">
+                    <h4 style="margin:0; color:#45f3ff;">Managing Tracks for Playlist: <span id="editorPlaylistName" style="color:#fff;"></span></h4>
+                    <button id="btnCloseTracksEditor" class="btn-outline"><i class="fas fa-xmark"></i> Close Editor</button>
+                </div>
+                
+                <div style="margin-top:16px; display:flex; gap:12px;">
+                    <select id="selectSongToAdd" class="search-admin-input" style="max-width:300px;">
+                        <!-- JS populated song options -->
+                    </select>
+                    <button id="btnAddSongToCurrentPlaylist" class="btn-primary"><i class="fas fa-plus"></i> Add Track to Playlist</button>
+                </div>
+
+                <table class="admin-table" style="margin-top:16px;">
+                    <thead>
+                        <tr>
+                            <th>Order</th>
+                            <th>Song Title</th>
+                            <th>Artist</th>
+                            <th>Reorder</th>
+                            <th>Remove</th>
+                        </tr>
+                    </thead>
+                    <tbody id="playlistTracksTableBody">
+                        <!-- JS Populated -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- TAB 3: SONGS CATALOG -->
+        <div id="tab-songs" class="tab-content-panel">
+            <div class="admin-card">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+                    <h3 style="margin:0; color:#fff;"><i class="fas fa-music"></i> Master Songs Catalog</h3>
+                    <button id="btnOpenAddSong" class="btn-primary" style="padding: 6px 14px; font-size:0.85rem;"><i class="fas fa-plus"></i> Add New Song</button>
+                </div>
+
+                <!-- Song Form Card -->
+                <div id="songFormCard" class="admin-card" style="display:none; background:#181b26; border-color:#45f3ff;">
+                    <h4 id="songFormTitle" style="margin-top:0; color:#45f3ff;">Add New Song</h4>
+                    <form id="songAdminForm">
+                        <input type="hidden" id="songEditId">
+                        <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap:12px; margin-bottom:12px;">
+                            <div>
+                                <label style="font-size:0.8rem; display:block; margin-bottom:4px;">Title *</label>
+                                <input type="text" id="songFormTitleInput" class="search-admin-input" style="max-width:100%;" required>
+                            </div>
+                            <div>
+                                <label style="font-size:0.8rem; display:block; margin-bottom:4px;">Artist *</label>
+                                <input type="text" id="songFormArtist" class="search-admin-input" style="max-width:100%;" required>
+                            </div>
+                            <div>
+                                <label style="font-size:0.8rem; display:block; margin-bottom:4px;">Album</label>
+                                <input type="text" id="songFormAlbum" class="search-admin-input" style="max-width:100%;">
+                            </div>
+                            <div>
+                                <label style="font-size:0.8rem; display:block; margin-bottom:4px;">Cover URL</label>
+                                <input type="url" id="songFormCover" class="search-admin-input" style="max-width:100%;" placeholder="https://...">
+                            </div>
+                            <div>
+                                <label style="font-size:0.8rem; display:block; margin-bottom:4px;">Audio Stream/File URL *</label>
+                                <input type="url" id="songFormAudio" class="search-admin-input" style="max-width:100%;" required placeholder="https://...">
+                            </div>
+                            <div>
+                                <label style="font-size:0.8rem; display:block; margin-bottom:4px;">Offline Downloadable</label>
+                                <select id="songFormDownloadable" class="search-admin-input" style="max-width:100%;">
+                                    <option value="true">Allowed</option>
+                                    <option value="false">Restricted</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div style="display:flex; gap:10px;">
+                            <button type="submit" class="btn-primary">Save Song</button>
+                            <button type="button" id="btnCancelSong" class="btn-outline">Cancel</button>
+                        </div>
+                    </form>
+                </div>
+
+                <div style="overflow-x:auto;">
+                    <table class="admin-table">
+                        <thead>
+                            <tr>
+                                <th>Cover</th>
+                                <th>Title</th>
+                                <th>Artist</th>
+                                <th>Album</th>
+                                <th>Downloadable</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="songTableBody">
+                            <!-- JS Populated -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 4: OFFLINE METADATA -->
+        <div id="tab-offline" class="tab-content-panel">
+            <div class="admin-card">
+                <h3 style="margin-top:0; color:#fff;"><i class="fas fa-cloud-arrow-down"></i> Manage Downloadable & Offline Metadata</h3>
+                <p style="color:#8e95a5; font-size:0.9rem;">Control which songs can be cached locally for offline playback and inspect downloadable song permissions.</p>
+
+                <div style="overflow-x:auto; margin-top:16px;">
+                    <table class="admin-table">
+                        <thead>
+                            <tr>
+                                <th>Track ID</th>
+                                <th>Song Title</th>
+                                <th>Artist</th>
+                                <th>Audio Source</th>
+                                <th>Offline Permission</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="offlineMetaTableBody">
+                            <!-- JS Populated -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+    </div>
+    <div id="adminToast" class="admin-toast"></div>
+
+    <script src="music-data.js"></script>
     <script src="admin.js"></script>
 </body>
 

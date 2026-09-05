@@ -536,6 +536,17 @@ document.getElementById('seeAllPlaylists')?.addEventListener('click', e => {
   renderLibrarySection('playlists');
 });
 
+document.getElementById('seeAllRecent')?.addEventListener('click', e => {
+  e.preventDefault();
+  navigateTo('search');
+});
+
+document.getElementById('seeAllAlbums')?.addEventListener('click', e => {
+  e.preventDefault();
+  navigateTo('library');
+  renderLibrarySection('albums');
+});
+
 // ── Sidebar Dynamic Playlists ───────────────────────────────
 function renderSidebarPlaylists() {
   const container = document.getElementById('sidebarPlaylistsList');
@@ -2887,11 +2898,378 @@ document.addEventListener('keydown', e => {
   }
 });
 
+// ============================================================
+// ── USER AUTHENTICATION SYSTEM ─────────────────────────────
+// ============================================================
+let currentUser = null;
+let userAuthToken = localStorage.getItem('dk_user_token') || '';
+let isUserAdmin = false;
+
+function initAuthSystem() {
+  const storedUser = localStorage.getItem('dk_user_info');
+  if (userAuthToken && storedUser) {
+    try {
+      currentUser = JSON.parse(storedUser);
+      isUserAdmin = (currentUser.role === 'admin' || currentUser.userId === 'admin');
+      updateAuthHeaderUI();
+    } catch (e) {
+      logoutUser();
+    }
+  } else {
+    updateAuthHeaderUI();
+  }
+}
+
+function updateAuthHeaderUI() {
+  const btnOpenAuthModal = document.getElementById('btnOpenAuthModal');
+  const userProfileBadge = document.getElementById('userProfileBadge');
+  const userNameLabel = document.getElementById('userNameLabel');
+  const userAvatarBtn = document.getElementById('userAvatarBtn');
+  const topbarAdminBtn = document.getElementById('topbarAdminBtn');
+
+  if (currentUser) {
+    if (btnOpenAuthModal) btnOpenAuthModal.style.display = 'none';
+    if (userProfileBadge) userProfileBadge.classList.remove('hidden');
+    if (userNameLabel) userNameLabel.textContent = currentUser.name || currentUser.userId;
+    if (userAvatarBtn) userAvatarBtn.textContent = (currentUser.name || currentUser.userId)[0].toUpperCase();
+    if (topbarAdminBtn) {
+      if (isUserAdmin) topbarAdminBtn.classList.remove('hidden');
+      else topbarAdminBtn.classList.add('hidden');
+    }
+  } else {
+    if (btnOpenAuthModal) btnOpenAuthModal.style.display = 'inline-flex';
+    if (userProfileBadge) userProfileBadge.classList.add('hidden');
+    if (topbarAdminBtn) topbarAdminBtn.classList.add('hidden');
+  }
+}
+
+let authMode = 'login';
+
+function openAuthModal(mode = 'login') {
+  authMode = mode;
+  const modal = document.getElementById('authModal');
+  const title = document.getElementById('authModalTitle');
+  const tabLogin = document.getElementById('tabAuthLogin');
+  const tabRegister = document.getElementById('tabAuthRegister');
+  const nameGroup = document.getElementById('authNameGroup');
+  const btnSubmit = document.getElementById('btnAuthSubmit');
+  const errorAlert = document.getElementById('authErrorAlert');
+
+  if (!modal) return;
+  if (errorAlert) errorAlert.classList.add('hidden');
+
+  if (mode === 'login') {
+    title.innerHTML = '<i class="fas fa-user-lock" style="color:var(--accent);"></i> User Login';
+    tabLogin.classList.add('active');
+    tabLogin.style.color = '#45f3ff';
+    tabLogin.style.borderBottom = '2px solid #45f3ff';
+    tabRegister.classList.remove('active');
+    tabRegister.style.color = '#8e95a5';
+    tabRegister.style.borderBottom = 'none';
+    nameGroup.classList.add('hidden');
+    btnSubmit.textContent = 'Log In';
+  } else {
+    title.innerHTML = '<i class="fas fa-user-plus" style="color:var(--accent);"></i> Register Account';
+    tabRegister.classList.add('active');
+    tabRegister.style.color = '#45f3ff';
+    tabRegister.style.borderBottom = '2px solid #45f3ff';
+    tabLogin.classList.remove('active');
+    tabLogin.style.color = '#8e95a5';
+    tabLogin.style.borderBottom = 'none';
+    nameGroup.classList.remove('hidden');
+    btnSubmit.textContent = 'Register & Log In';
+  }
+
+  modal.classList.remove('hidden');
+}
+
+function closeAuthModal() {
+  const modal = document.getElementById('authModal');
+  if (modal) modal.classList.add('hidden');
+}
+
+async function handleAuthFormSubmit(e) {
+  e.preventDefault();
+  const userIdInput = document.getElementById('authUserIdInput');
+  const passwordInput = document.getElementById('authPasswordInput');
+  const nameInput = document.getElementById('authNameInput');
+  const btnSubmit = document.getElementById('btnAuthSubmit');
+  const errorAlert = document.getElementById('authErrorAlert');
+
+  const userId = userIdInput.value.trim();
+  const password = passwordInput.value.trim();
+  const name = nameInput ? nameInput.value.trim() : '';
+
+  if (!userId || !password) {
+    if (errorAlert) {
+      errorAlert.textContent = 'User ID and Password are required.';
+      errorAlert.classList.remove('hidden');
+    }
+    return;
+  }
+
+  btnSubmit.disabled = true;
+  btnSubmit.textContent = authMode === 'login' ? 'Logging in...' : 'Registering...';
+  if (errorAlert) errorAlert.classList.add('hidden');
+
+  try {
+    const apiBase = window.location.origin && window.location.origin !== 'null' && !window.location.origin.startsWith('file:')
+      ? window.location.origin
+      : 'http://localhost:5500';
+
+    const endpoint = authMode === 'login' ? '/api/auth/login' : '/api/auth/register';
+    const payload = { userId, password };
+    if (authMode === 'register') payload.name = name || userId;
+
+    let authSuccess = false;
+    let authData = null;
+
+    try {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 1500);
+
+      const res = await fetch(`${apiBase}${endpoint}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+        signal: controller.signal
+      });
+      clearTimeout(timeoutId);
+
+      if (res.ok) {
+        const data = await res.json();
+        if (data && data.success) {
+          authSuccess = true;
+          authData = data;
+        }
+      }
+    } catch (e) {
+      // Backend offline / unreachable, use local auth fallback
+    }
+
+    if (!authSuccess) {
+      // Local Auth Fallback
+      let localUsers = [];
+      try {
+        const stored = localStorage.getItem('dk_admin_users_db');
+        if (stored) localUsers = JSON.parse(stored);
+      } catch (e) {}
+
+      if (authMode === 'login') {
+        if (userId === 'admin' && password === 'Qwerty@866') {
+          authData = {
+            token: 'dk_admin_token_sec_local_' + Date.now(),
+            isAdmin: true,
+            user: { id: 'admin_01', userId: 'admin', name: 'System Administrator', role: 'admin', status: 'active' }
+          };
+          authSuccess = true;
+        } else {
+          const matched = localUsers.find(u => u.userId.toLowerCase() === userId.toLowerCase());
+          if (matched) {
+            if (matched.status === 'disabled') {
+              throw new Error('Account has been disabled by administrator.');
+            }
+            authData = {
+              token: 'dk_user_token_local_' + matched.userId + '_' + Date.now(),
+              isAdmin: (matched.role === 'admin'),
+              user: matched
+            };
+            authSuccess = true;
+          } else {
+            // Allow demo login
+            authData = {
+              token: 'dk_user_token_local_' + userId + '_' + Date.now(),
+              isAdmin: false,
+              user: { id: 'usr_' + Date.now(), userId: userId, name: name || userId, role: 'user', status: 'active' }
+            };
+            authSuccess = true;
+          }
+        }
+      } else {
+        // Register mode
+        if (userId.toLowerCase() === 'admin') {
+          throw new Error("Cannot register reserved User ID 'admin'.");
+        }
+        if (localUsers.some(u => u.userId.toLowerCase() === userId.toLowerCase())) {
+          throw new Error("User ID already exists. Please choose another.");
+        }
+        const newUser = {
+          id: 'usr_' + Date.now(),
+          userId: userId,
+          name: name || userId,
+          role: 'user',
+          status: 'active',
+          createdAt: new Date().toISOString()
+        };
+        localUsers.push(newUser);
+        localStorage.setItem('dk_admin_users_db', JSON.stringify(localUsers));
+
+        authData = {
+          token: 'dk_user_token_local_' + newUser.userId + '_' + Date.now(),
+          isAdmin: false,
+          user: newUser
+        };
+        authSuccess = true;
+      }
+    }
+
+    userAuthToken = authData.token;
+    currentUser = authData.user;
+    isUserAdmin = !!authData.isAdmin;
+
+    localStorage.setItem('dk_user_token', userAuthToken);
+    localStorage.setItem('dk_user_info', JSON.stringify(currentUser));
+
+    updateAuthHeaderUI();
+    closeAuthModal();
+    showToast(`✓ Welcome ${currentUser.name || currentUser.userId}!`);
+
+  } catch (err) {
+    if (errorAlert) {
+      errorAlert.textContent = err.message || 'Authentication error';
+      errorAlert.classList.remove('hidden');
+    }
+  } finally {
+    btnSubmit.disabled = false;
+    btnSubmit.textContent = authMode === 'login' ? 'Log In' : 'Register & Log In';
+  }
+}
+
+function logoutUser() {
+  userAuthToken = '';
+  currentUser = null;
+  isUserAdmin = false;
+  localStorage.removeItem('dk_user_token');
+  localStorage.removeItem('dk_user_info');
+  updateAuthHeaderUI();
+  showToast('Logged out successfully.');
+}
+
+document.getElementById('btnOpenAuthModal')?.addEventListener('click', () => openAuthModal('login'));
+document.getElementById('btnCloseAuthModal')?.addEventListener('click', closeAuthModal);
+document.getElementById('tabAuthLogin')?.addEventListener('click', () => openAuthModal('login'));
+document.getElementById('tabAuthRegister')?.addEventListener('click', () => openAuthModal('register'));
+document.getElementById('userAuthForm')?.addEventListener('submit', handleAuthFormSubmit);
+document.getElementById('btnUserLogout')?.addEventListener('click', logoutUser);
+
+
+// ============================================================
+// ── MULTILINGUAL VOICE SEARCH SYSTEM ───────────────────────
+// ============================================================
+let speechRecognizer = null;
+let isVoiceSearchActive = false;
+
+function initVoiceSearchEngine() {
+  const btnMic = document.getElementById('btnVoiceSearch');
+  const overlay = document.getElementById('voiceSearchOverlay');
+  const btnStop = document.getElementById('btnStopVoiceSearch');
+  const transcriptPreview = document.getElementById('voiceTranscriptPreview');
+  const statusText = document.getElementById('voiceLanguageStatus');
+
+  if (!btnMic) return;
+
+  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+
+  if (!SpeechRecognition) {
+    btnMic.title = 'Voice search not supported in this browser';
+    btnMic.addEventListener('click', () => {
+      showToast('⚠️ Voice search is not supported in this browser. Please type your search query.');
+    });
+    return;
+  }
+
+  btnMic.addEventListener('click', () => {
+    if (isVoiceSearchActive) {
+      stopVoiceSearch();
+      return;
+    }
+    startVoiceSearch();
+  });
+
+  btnStop?.addEventListener('click', stopVoiceSearch);
+
+  function startVoiceSearch() {
+    try {
+      speechRecognizer = new SpeechRecognition();
+      speechRecognizer.continuous = false;
+      speechRecognizer.interimResults = true;
+
+      const userLang = navigator.language || 'ta-IN';
+      speechRecognizer.lang = userLang.startsWith('ta') ? 'ta-IN' : (userLang || 'en-US');
+
+      speechRecognizer.onstart = () => {
+        isVoiceSearchActive = true;
+        btnMic.classList.add('listening');
+        if (overlay) overlay.classList.remove('hidden');
+        if (statusText) statusText.textContent = `Listening in ${speechRecognizer.lang} (Tamil, English, etc.)`;
+        if (transcriptPreview) transcriptPreview.textContent = '"Listening..."';
+      };
+
+      speechRecognizer.onresult = (e) => {
+        let transcript = '';
+        for (let i = e.resultIndex; i < e.results.length; i++) {
+          transcript += e.results[i][0].transcript;
+        }
+        if (transcriptPreview) transcriptPreview.textContent = `"${transcript}"`;
+
+        if (e.results[0].isFinal) {
+          executeVoiceQuery(transcript);
+        }
+      };
+
+      speechRecognizer.onerror = (e) => {
+        console.warn('[Voice Search Error]:', e.error);
+        if (e.error === 'not-allowed') {
+          showToast('⚠️ Microphone permission denied. Please allow microphone access in browser.');
+        } else if (e.error !== 'no-speech') {
+          showToast('Voice recognition error: ' + e.error);
+        }
+        stopVoiceSearch();
+      };
+
+      speechRecognizer.onend = () => {
+        stopVoiceSearch();
+      };
+
+      speechRecognizer.start();
+    } catch (err) {
+      console.error('Failed to start voice recognition:', err);
+      showToast('Failed to start voice search');
+      stopVoiceSearch();
+    }
+  }
+
+  function stopVoiceSearch() {
+    isVoiceSearchActive = false;
+    if (speechRecognizer) {
+      try { speechRecognizer.stop(); } catch (e) {}
+      speechRecognizer = null;
+    }
+    btnMic?.classList.remove('listening');
+    if (overlay) overlay.classList.add('hidden');
+  }
+
+  function executeVoiceQuery(queryText) {
+    const q = queryText.trim();
+    if (!q) return;
+
+    showToast(`🎤 Voice Search: "${q}"`);
+    if (searchInput) searchInput.value = q;
+    navigateTo('search');
+    renderSearchSection();
+    stopVoiceSearch();
+  }
+}
+
 // ── Boot Application ────────────────────────────────────────
 window.addEventListener('DOMContentLoaded', () => {
   updateNetworkStatus();
   setup3D();
   fetchSongs();
+  initAuthSystem();
+  initVoiceSearchEngine();
+  initTamilListeners();
+  initAIAssistantSection();
 });
 
 // Expose core variables and functions globally
@@ -2904,3 +3282,4 @@ window.toggleOfflineDownload = toggleOfflineDownload;
 window.showToast = showToast;
 window.navigateTo = navigateTo;
 window.audioEl = audioEl;
+

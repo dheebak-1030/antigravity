@@ -1,0 +1,47 @@
+[
+  {
+    "id": "pl_tamil_90s",
+    "name": "Tamil 90s Nostalgia Hits",
+    "description": "Evergreen 90s classics from AR Rahman & Ilaiyaraaja. Pure nostalgic memories.",
+    "cover": "https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=500&auto=format&fit=crop&q=80",
+    "created": "2026-09-05T08:00:00.000Z",
+    "songs": ["tm_02", "tm_03", "tm_08", "tm_10", "tm_12"],
+    "createdBy": "admin"
+  },
+  {
+    "id": "pl_tamil_arr",
+    "name": "AR Rahman Romantic Magic",
+    "description": "Soulful romantic melodies composed by the Mozart of Madras, AR Rahman.",
+    "cover": "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=500&auto=format&fit=crop&q=80",
+    "created": "2026-09-05T08:00:00.000Z",
+    "songs": ["tm_02", "tm_04", "tm_10", "tm_12"],
+    "createdBy": "admin"
+  },
+  {
+    "id": "pl_tamil_raja",
+    "name": "Ilaiyaraaja Symphony",
+    "description": "Timeless orchestration and emotional melodies by Maestro Ilaiyaraaja.",
+    "cover": "https://images.unsplash.com/photo-1509198397868-475647b2a1e5?w=500&auto=format&fit=crop&q=80",
+    "created": "2026-09-05T08:00:00.000Z",
+    "songs": ["tm_03", "tm_05", "tm_08"],
+    "createdBy": "admin"
+  },
+  {
+    "id": "pl_tamil_sad",
+    "name": "Tamil Sad & Soulful Songs",
+    "description": "Deep emotional Soga paattu and heart-touching Tamil breakup melodies.",
+    "cover": "https://images.unsplash.com/photo-1513694203232-719a280e022f?w=500&auto=format&fit=crop&q=80",
+    "created": "2026-09-05T08:00:00.000Z",
+    "songs": ["tm_05", "tm_07", "tm_11"],
+    "createdBy": "admin"
+  },
+  {
+    "id": "pl_lofi_study",
+    "name": "Lo-Fi Study & Coffee Beats",
+    "description": "Deep focus, smooth vinyl warmth, and relaxing downtempo study music.",
+    "cover": "https://images.unsplash.com/photo-1501386761578-eac5c94b800a?w=500&auto=format&fit=crop&q=80",
+    "created": "2026-09-05T08:00:00.000Z",
+    "songs": ["cf_lofi_01", "tm_01"],
+    "createdBy": "admin"
+  }
+]

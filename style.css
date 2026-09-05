@@ -438,7 +438,7 @@ body {
   background: var(--bg-elevated);
   border: 1px solid var(--border);
   border-radius: var(--radius-full);
-  padding: 10px 16px 10px 42px;
+  padding: 10px 44px 10px 42px;
   color: var(--text-primary);
   font-size: 0.88rem;
   outline: none;
@@ -452,6 +452,21 @@ body {
 }
 .search-input::placeholder {
   color: var(--text-muted);
+}
+
+.search-wrap .btn-voice-search {
+  position: absolute;
+  right: 8px;
+  width: 32px;
+  height: 32px;
+  color: var(--accent-light);
+  border-radius: 50%;
+  transition: all 0.2s ease;
+}
+.search-wrap .btn-voice-search:hover {
+  background: rgba(69, 243, 255, 0.15);
+  color: #fff;
+  transform: scale(1.1);
 }
 
 .topbar-right {
@@ -4789,5 +4804,89 @@ td {
 .ai-recommend-modal-card {
   max-width: 580px;
 }
+
+/* ===== VOICE SEARCH & AUTH COMPONENTS ===== */
+.btn-voice-search {
+  background: transparent;
+  border: none;
+  color: #45f3ff;
+  font-size: 1.1rem;
+  padding: 6px 10px;
+  cursor: pointer;
+  border-radius: var(--radius-full);
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn-voice-search:hover {
+  color: #fff;
+  background: rgba(69, 243, 255, 0.15);
+  transform: scale(1.1);
+}
+
+.btn-voice-search.listening {
+  color: #ff4d4d;
+  animation: pulseMic 1.2s infinite;
+}
+
+@keyframes pulseMic {
+  0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(69, 243, 255, 0.5); }
+  70% { transform: scale(1.1); box-shadow: 0 0 0 12px rgba(69, 243, 255, 0); }
+  100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(69, 243, 255, 0); }
+}
+
+.user-auth-area {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.user-profile-badge {
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-full);
+  padding: 4px 10px 4px 4px;
+}
+
+.user-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #45f3ff, #8b5cf6);
+  color: #0b0c10;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.85rem;
+}
+
+.download-badge-icon {
+  color: #46d369;
+  font-size: 0.85rem;
+  margin-left: 6px;
+}
+
+.track-download-btn {
+  background: transparent;
+  border: none;
+  color: var(--text-secondary);
+  cursor: pointer;
+  padding: 6px;
+  font-size: 0.95rem;
+  transition: all 0.2s ease;
+}
+
+.track-download-btn:hover {
+  color: #45f3ff;
+  transform: scale(1.15);
+}
+
+.track-download-btn.downloaded {
+  color: #46d369;
+}
+
 
 
