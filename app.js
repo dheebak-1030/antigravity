@@ -310,8 +310,6 @@ function navigateTo(section, pushHistory = true) {
   } else if (section === 'visualizer3d') {
     update3DViewInfo();
     window.DK_3DAudio?.resizeCanvas();
-  } else if (section === 'tamil-music') {
-    renderTamilSection();
   } else if (section === 'ai-assistant') {
     initAIAssistantSection();
   } else if (section === 'home') {
@@ -2589,78 +2587,7 @@ document.getElementById('btnModalCreatePl')?.addEventListener('click', () => {
 });
 
 // ── TAMIL DISCOVERY & AI ASSISTANT MODULE ─────────────────
-let activeTamilFilter = 'all';
 
-function renderTamilSection(filterMode = activeTamilFilter, query = '') {
-  activeTamilFilter = filterMode;
-  const grid = document.getElementById('tamilGrid');
-  const countBadge = document.getElementById('tamilTotalCount');
-  if (!grid) return;
-
-  const searchVal = query || document.getElementById('tamilSearchInput')?.value || '';
-  let list = songs;
-
-  // 1. Multi-language fuzzy search matcher
-  if (window.DK_TamilAIEngine) {
-    list = window.DK_TamilAIEngine.searchTamilSongs(songs, searchVal);
-  }
-
-  // 2. Mood / Category Chip Filter
-  if (filterMode !== 'all') {
-    if (filterMode === '90s') {
-      list = list.filter(s => s.year >= 1990 && s.year <= 1999);
-    } else if (filterMode === 'Ilaiyaraaja') {
-      list = list.filter(s => (s.artist || '').toLowerCase().includes('ilaiyaraaja') || (s.search_tags || []).includes('ilaiyaraaja'));
-    } else if (filterMode === 'AR Rahman') {
-      list = list.filter(s => (s.artist || '').toLowerCase().includes('rahman') || (s.search_tags || []).includes('ar rahman'));
-    } else {
-      list = list.filter(s => s.mood === filterMode || s.genre === filterMode || (s.search_tags || []).includes(filterMode.toLowerCase()));
-    }
-  }
-
-  if (countBadge) countBadge.textContent = list.length;
-
-  if (!list.length) {
-    grid.innerHTML = `
-      <div class="empty-state">
-        <i class="fas fa-om" style="font-size:2.2rem;margin-bottom:12px;opacity:0.5;color:#f59e0b;"></i>
-        <p>No Tamil tracks matching "${esc(searchVal || filterMode)}"</p>
-        <span style="font-size:0.8rem;">Try searching in Tamil (தமிழ்), Tanglish (e.g. 'Kannana Kanne') or English</span>
-      </div>`;
-    return;
-  }
-
-  renderSongGrid(list, 'tamilGrid');
-}
-
-function initTamilListeners() {
-  const searchInput = document.getElementById('tamilSearchInput');
-  const aiFilterBtn = document.getElementById('btnTamilAISearch');
-  const moodChips = document.querySelectorAll('#tamilMoodChips .genre-chip');
-
-  searchInput?.addEventListener('input', e => {
-    renderTamilSection(activeTamilFilter, e.target.value);
-  });
-
-  aiFilterBtn?.addEventListener('click', () => {
-    const searchVal = searchInput?.value || 'melody';
-    const recs = window.DK_TamilAIEngine ? window.DK_TamilAIEngine.searchTamilSongs(songs, searchVal) : songs;
-    if (recs.length) {
-      openAIRecommendModal(recs[0]);
-    } else {
-      showToast('🤖 AI Tamil Engine: Searching catalog...');
-    }
-  });
-
-  moodChips.forEach(chip => {
-    chip.addEventListener('click', () => {
-      moodChips.forEach(c => c.classList.remove('active'));
-      chip.classList.add('active');
-      const filter = chip.dataset.tamilFilter;
-      renderTamilSection(filter, searchInput?.value || '');
-    });
-  });
-}
 
 // ── AI Assistant Chat Controller ────────────────────────────
 let aiChatInitialized = false;
@@ -3069,6 +2996,9 @@ async function handleAuthFormSubmit(e) {
             if (matched.status === 'disabled') {
               throw new Error('Account has been disabled by administrator.');
             }
+            if (matched.password && matched.password !== password && matched.passwordHash !== password) {
+              throw new Error('Invalid User ID or Password.');
+            }
             authData = {
               token: 'dk_user_token_local_' + matched.userId + '_' + Date.now(),
               isAdmin: (matched.role === 'admin'),
@@ -3076,13 +3006,7 @@ async function handleAuthFormSubmit(e) {
             };
             authSuccess = true;
           } else {
-            // Allow demo login
-            authData = {
-              token: 'dk_user_token_local_' + userId + '_' + Date.now(),
-              isAdmin: false,
-              user: { id: 'usr_' + Date.now(), userId: userId, name: name || userId, role: 'user', status: 'active' }
-            };
-            authSuccess = true;
+            throw new Error('Invalid User ID or Password. Please register or check credentials.');
           }
         }
       } else {
@@ -3096,6 +3020,8 @@ async function handleAuthFormSubmit(e) {
         const newUser = {
           id: 'usr_' + Date.now(),
           userId: userId,
+          password: password,
+          passwordHash: password,
           name: name || userId,
           role: 'user',
           status: 'active',
@@ -3268,7 +3194,6 @@ window.addEventListener('DOMContentLoaded', () => {
   fetchSongs();
   initAuthSystem();
   initVoiceSearchEngine();
-  initTamilListeners();
   initAIAssistantSection();
 });
 

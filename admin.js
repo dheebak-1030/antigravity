@@ -161,12 +161,14 @@ function executeLocalFallback(endpoint, method, body) {
         if (method === 'GET') {
             return { success: true, users };
         } else if (method === 'POST') {
-            if (users.some(u => u.userId === body.userId)) {
+            if (users.some(u => u.userId.toLowerCase() === body.userId.toLowerCase())) {
                 throw new Error("User ID already exists.");
             }
             const newUser = {
                 id: "usr_" + Date.now(),
                 userId: body.userId,
+                password: body.password || "",
+                passwordHash: body.password || "",
                 name: body.name || body.userId,
                 role: body.role || "user",
                 status: body.status || "active",
@@ -181,6 +183,10 @@ function executeLocalFallback(endpoint, method, body) {
             if (body.name) users[idx].name = body.name;
             if (body.role) users[idx].role = body.role;
             if (body.status) users[idx].status = body.status;
+            if (body.password) {
+                users[idx].password = body.password;
+                users[idx].passwordHash = body.password;
+            }
             saveLocalUsers(users);
             return { success: true, message: "User updated successfully." };
         } else if (method === 'DELETE') {

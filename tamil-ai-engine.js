@@ -212,7 +212,7 @@
       replyText = `⚡ **High-Energy Tamil Kuthu & Party Hits (துள்ளல் இசை)**\n\nTurn up the volume! Here are high-tempo Tamil dance beats to boost your mood!`;
       explanation = `High energy folk and dance beats for instant enthusiasm.`;
     } else {
-      replyText = `✨ **AI Tamil Music Recommendation**\n\nBased on your query ` + `"${prompt}"`, `here are matching Tamil tracks handpicked by your AI Music Assistant:`;
+      replyText = `✨ **AI Music Recommendation**\n\nBased on your query "${prompt}", here are matching tracks handpicked by your AI Music Assistant:`;
       explanation = `Matched ${matchedSongs.length} songs corresponding to "${prompt}".`;
     }
 
